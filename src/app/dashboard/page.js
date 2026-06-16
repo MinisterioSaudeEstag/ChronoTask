@@ -15,7 +15,7 @@ const FUNCIONARIOS = [
   "Matheus Nascimento",
   "Ana Aparecida",
   "Giselly Soares",
-  "Emilly",
+  "Emilly Alves",
   "Maria Luna"
 ];
 

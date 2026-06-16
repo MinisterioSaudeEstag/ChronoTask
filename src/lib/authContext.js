@@ -9,7 +9,7 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const ADMINS_LIST = ["Eliane Maria", "Maria Juliana", "Monalisa Aquino"];
+  const ADMINS_LIST = ["Eliane Leal", "Maria Juliana", "Monalisa Aquino"];
 
   const STAFF_LIST = ["Arthur Vinícius", "Matheus Nascimento", "Ana Aparecida", "Giselly Soares", "Emilly Alves"];
 
