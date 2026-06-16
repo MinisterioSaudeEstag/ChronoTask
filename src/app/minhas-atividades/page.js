@@ -5,7 +5,8 @@ import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
-import { Clock, Calendar, FileText, ExternalLink, CheckCircle2, AlertCircle } from "lucide-react";
+import { Clock, Calendar, FileText, ExternalLink, CheckCircle2 } from "lucide-react";
+import { toast } from 'sonner'; 
 
 export default function MinhasAtividades() {
   const { user } = useAuth();
@@ -43,7 +44,6 @@ export default function MinhasAtividades() {
           {tasks.map((task) => (
             <Card key={task.id} className="hover:border-[#004785] transition-all group overflow-hidden">
               <CardContent className="p-0">
-                {/* Barra de Status Lateral */}
                 <div className={`h-full flex`}>
                   <div className={`w-2 ${
                     task.status === 'concluida' ? 'bg-emerald-500' : 
@@ -58,13 +58,16 @@ export default function MinhasAtividades() {
                       }`}>
                         {task.status.replace('_', ' ')}
                       </span>
-                      <a 
-                        href={`https://sei.saude.gov.br/processo/${task.processo}`} 
-                        target="_blank" 
-                        className="text-primary hover:underline text-xs flex items-center gap-1 font-medium"
+
+                      <button 
+                        onClick={() => {
+                          navigator.clipboard.writeText(task.processo);
+                          toast.success("Número do processo copiado!");
+                        }}
+                        className="text-primary hover:underline text-xs flex items-center gap-1 font-medium transition-all"
                       >
                         Processo <ExternalLink className="w-3 h-3" />
-                      </a>
+                      </button>
                     </div>
 
                     <div className="space-y-1">

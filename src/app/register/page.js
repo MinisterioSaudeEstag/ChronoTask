@@ -70,7 +70,7 @@ export default function RegisterPage() {
 
         <form onSubmit={handleRegister} className="space-y-4">
           <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Nome Completo</label>
+            <label className="text-sm font-medium text-foreground">Nome e Sobrenome</label>
             <div className="relative">
               <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input 

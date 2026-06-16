@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
+import { toast } from 'sonner';
 
 export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
@@ -19,8 +20,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
   ];
 
- const generateProcessLink = (numero) => `https://sei.saude.gov.br/processo!id/detalhe?id=${numero}`;
-
   async function handleStatusChange(taskId, newStatus) {
     setUpdatingId(taskId);
     try {
@@ -33,7 +32,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
-      alert("Erro ao atualizar status: " + error.message);
+      toast.error("Erro ao atualizar status: " + error.message);
     } finally {
       setUpdatingId(null);
     }
@@ -72,14 +71,15 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     <p className="text-xs text-muted-foreground">{item.produto}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <a 
-                      href={generateProcessLink(item.processo)} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-primary hover:underline font-medium"
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(item.processo);
+                        toast.success("Número do processo copiado!");
+                      }}
+                      className="flex items-center gap-1 text-primary hover:underline font-medium transition-all hover:scale-105"
                     >
                       {item.processo} <ExternalLink className="w-3 h-3" />
-                    </a>
+                    </button>
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-xs">Início: {item.start_date}</p>
