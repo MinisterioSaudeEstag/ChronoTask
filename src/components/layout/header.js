@@ -27,8 +27,8 @@ export default function Header() {
       <div className="flex items-center gap-6">
         <Link href="/dashboard" className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <img src="/logo-ms.png" alt="Ministério da Saúde" className="h-12 w-auto object-contain" />
-            <img src="/logo-sus.png" alt="SUS" className="h-12 w-auto object-contain" />
+            <img src="/logo-ms.jpg" alt="Ministério da Saúde" className="h-12 w-auto object-contain" />
+            <img src="/logo-sus.jpg" alt="SUS" className="h-12 w-auto object-contain" />
           </div>
           
           <div className="h-10 w-[1px] bg-border mx-2" /> 

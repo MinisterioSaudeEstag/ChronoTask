@@ -7,7 +7,7 @@ export default function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-6">
         <div className="flex flex-col items-center md:items-start gap-2">
           <div className="flex items-center gap-3 opacity-80">
-             <img src="/logo-ms.png" alt="MS" className="h-6 w-auto" />
+             <img src="/logo-ms.jpg" alt="MS" className="h-6 w-auto" />
              <span className="text-xs font-bold text-muted-foreground uppercase">Ministério da Saúde</span>
           </div>
           <p className="text-[10px] text-muted-foreground">
