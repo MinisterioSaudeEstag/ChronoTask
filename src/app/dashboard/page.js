@@ -16,6 +16,7 @@ const FUNCIONARIOS = [
   "Ana Aparecida",
   "Giselly Soares",
   "Emilly",
+  "Maria Luna"
 ];
 
 export default function Dashboard() {
