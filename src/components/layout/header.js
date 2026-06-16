@@ -23,15 +23,24 @@ export default function Header() {
   }
 
   return (
-    <header className="h-16 border-b border-border/60 bg-white dark:bg-slate-900 sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
-      <div className="flex items-center gap-8">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-[#004785] rounded-lg flex items-center justify-center text-white font-bold text-xs">
-            CT
+ <header className="h-20 border-b border-border/60 bg-white dark:bg-slate-900 sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
+      <div className="flex items-center gap-6">
+        <Link href="/dashboard" className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <img src="/logo-ms.png" alt="Ministério da Saúde" className="h-12 w-auto object-contain" />
+            <img src="/logo-sus.png" alt="SUS" className="h-12 w-auto object-contain" />
           </div>
-          <span className="font-bold text-lg tracking-tight text-[#004785] hidden sm:block">
-            ChronoTask
-          </span>
+          
+          <div className="h-10 w-[1px] bg-border mx-2" /> 
+          
+          <div className="flex flex-col">
+            <span className="font-bold text-xl tracking-tight text-[#004785] leading-none">
+              ChronoTask
+            </span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+              DITRE / PE
+            </span>
+          </div>
         </Link>
 
         <nav className="hidden md:flex items-center gap-4">
