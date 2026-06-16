@@ -58,20 +58,6 @@ export default function LoginPage() {
         </div>
 
         <div className="space-y-6">
-          <Button 
-            type="button" 
-            onClick={signInWithMicrosoft} 
-            variant="outline"
-            className="w-full py-6 border-slate-300 dark:border-slate-700 text-foreground hover:bg-slate-50 dark:hover:bg-slate-800 flex items-center justify-center gap-3 text-sm font-medium transition-all"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 23 23">
-              <path fill="#f25022" d="M1 1h10v10H1z"/>
-              <path fill="#7fbb00" d="M12 1h10v10H12z"/>
-              <path fill="#00a4ef" d="M1 12h10v10H1z"/>
-              <path fill="#ffb900" d="M12 12h10v10H12z"/>
-            </svg>
-            Entrar com Outlook / Microsoft
-          </Button>
 
           <div className="relative flex items-center justify-center">
             <div className="border-t border-border w-full"></div>
