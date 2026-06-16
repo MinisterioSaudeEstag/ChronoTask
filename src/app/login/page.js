@@ -1,91 +1,125 @@
 "use client";
-
-import React, { useState } from "react";
+import React from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient";
-import { useRouter } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Lock, Mail, LogIn } from "lucide-react";
-import Link from "next/link";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
+import { ClipboardList, Clock, CheckCircle2, AlertTriangle, Users } from "lucide-react";
+import FuncionarioCard from "@/components/demanda/employeCard";
+import NovaDemandaDialog from "@/components/demanda/newDemandDialog";
+import DemandasRecentesTable from "@/components/demanda/recentDemandTable";
 
-export default function LoginPage() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+const FUNCIONARIOS = [
+  "Arthur Vinícius",
+  "Matheus Nascimento",
+  "Ana Aparecida",
+  "Giselly Soares",
+  "Emilly",
+  "Maria Luna"
+];
 
-  async function handleLogin(e) {
-    e.preventDefault();
-    setLoading(true);
+export default function Dashboard() {
+  const { user } = useAuth();
+  const isAdmin = user?.role === "admin";
+  const [taskToEdit, setTaskToEdit] = useState(null);
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data: demandas = [], isLoading } = useQuery({
+    queryKey: ["demandas"],
+    queryFn: async () => {
+      const { data, error } = await supabase.from("tasks").select("*").order("created_at", { ascending: false });
+      return data || [];
 
-    if (error) {
-      alert("Erro ao entrar: " + error.message);
-    } else {
-      router.push("/dashboard");
-      router.refresh();
-    }
-    setLoading(false);
+      if (error) {
+        console.error("Erro ao buscar demandas:", error);
+        return [];
+      }
+      return data;
+    },
+  });
+
+  const myDemandas = !isAdmin
+    ? demandas.filter(d => d.funcionario_id === user?.id)
+    : demandas;
+
+  const stats = [
+    { label: "Total", value: myDemandas.length, icon: ClipboardList, color: "text-primary" },
+    { label: "Pendentes", value: myDemandas.filter(d => d.status === "pendente").length, icon: Clock, color: "text-amber-500" },
+    { label: "Em Andamento", value: myDemandas.filter(d => d.status === "em_andamento").length, icon: Clock, color: "text-blue-500" },
+    { label: "Concluídas", value: myDemandas.filter(d => d.status === "concluida").length, icon: CheckCircle2, color: "text-emerald-500" },
+    { label: "Atrasadas", value: myDemandas.filter(d => d.status === "atrasada").length, icon: AlertTriangle, color: "text-red-500" },
+  ];
+
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <Skeleton className="h-10 w-64" />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-border/60 p-8">
-        <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-[#004785] rounded-2xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-2xl">
-            CT
-          </div>
-          <h1 className="text-2xl font-bold text-foreground">Bem-vindo ao ChronoTask</h1>
-          <p className="text-muted-foreground text-sm mt-2">Entre com seu e-mail institucional</p>
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground tracking-tight">
+            Olá, {user?.full_name?.split(" ")[0] || "Usuário"} 👋
+          </h1>
+          <p className="text-muted-foreground text-sm mt-1">
+            {isAdmin ? "Painel de controle de demandas da equipe" : "Suas demandas e atividades"}
+          </p>
         </div>
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">E-mail</label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="email" 
-                placeholder="nome@saude.gov.br" 
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-sm focus:ring-2 focus:ring-[#004785] outline-none transition-all"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground">Senha</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                type="password" 
-                placeholder="••••••••" 
-                className="w-full pl-10 pr-4 py-2 rounded-lg border border-border bg-background text-sm focus:ring-2 focus:ring-[#004785] outline-none transition-all"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-          </div>
-
-          <Button 
-            type="submit" 
-            disabled={loading} 
-            className="w-full bg-[#004785] hover:bg-[#003566] text-white py-6 gap-2"
-          >
-            {loading ? "Entrando..." : <><LogIn className="w-4 h-4" /> Acessar Sistema</>}
-          </Button>
-        </form>
-
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          Não tem conta?{" "}
-          <Link href="/register" className="text-[#004785] font-semibold hover:underline">
-            Cadastre-se aqui
-          </Link>
-        </div>
+        {isAdmin && (
+          <NovaDemandaDialog 
+            taskToEdit={taskToEdit}
+            setTaskToEdit={setTaskToEdit}
+          />
+        )}
       </div>
+
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+        {stats.map(stat => (
+          <Card key={stat.label} className="border-border/60">
+            <CardContent className="p-4 flex items-center gap-3">
+              <div className={`p-2 rounded-lg bg-muted ${stat.color}`}>
+                <stat.icon className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{stat.value}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {isAdmin && (
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <Users className="w-5 h-5 text-primary" />
+            <h2 className="text-lg font-semibold text-foreground">Equipe</h2>
+          </div>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {FUNCIONARIOS.map(nome => (
+              <FuncionarioCard
+                key={nome}
+                nome={nome}
+                demandas={demandas.filter(d => d.funcionario_nome === nome)}
+              />
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <DemandasRecentesTable demandas={isAdmin ? demandas : myDemandas} 
+        isAdmin={isAdmin} 
+        onEdit={(task) => setTaskToEdit(task)}
+        />
+      </section>
     </div>
   );
 }

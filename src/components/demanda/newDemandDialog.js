@@ -6,83 +6,42 @@ import { X, Plus, Loader2 } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 
-export default function NovaDemandaDialog() {
+export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [funcionarios, setFuncionarios] = useState([]);
 
   const [formData, setFormData] = useState({
-    funcionario_id: "",
-    funcionario_nome: "",
-    descricao: "",
-    produto: "Planilha",
-    expected_time: "",
-    expected_date: "",
-    start_time: "",
-    end_time: "",
-    processo: "",
-    convenio: "",
-    convenente: "",
+    funcionario_id: "", funcionario_nome: "", descricao: "", produto: "Planilha",
+    expected_time: "", expected_date: "", start_time: "", end_time: "",
+    processo: "", convenio: "", convenente: "",
   });
 
   useEffect(() => {
-    if (isOpen) {
-      async function fetchFuncionarios() {
-        const { data } = await supabase.from("profiles").select("id, full_name").neq("role", "admin");
-        if (data) setFuncionarios(data);
-      }
-      fetchFuncionarios();
+    if (taskToEdit) {
+      setFormData(taskToEdit);
+      setIsOpen(true);
     }
-  }, [isOpen]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleEmployeeChange = (e) => {
-    const id = e.target.value;
-    const func = funcionarios.find(f => f.id === id);
-    setFormData(prev => ({ ...prev, funcionario_id: id, funcionario_nome: func?.full_name || "" }));
-  };
+  }, [taskToEdit]);
 
   async function handleSave(e) {
     e.preventDefault();
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
-
-      const finalData = { ...formData };
-      if (finalData.produto === "Outro") {
-        finalData.convenio = "";
-        finalData.convenente = "";
+      
+      if (taskToEdit) {
+        const { error } = await supabase.from("tasks").update(formData).eq("id", taskToEdit.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("tasks").insert([{ ...formData, admin_id: user.id, status: "pendente" }]);
+        if (error) throw error;
       }
 
-      const { error } = await supabase.from("tasks").insert([{
-        ...finalData,
-        admin_id: user.id,
-        status: "pendente",
-      }]);
-      
-      if (error) throw error;
-      alert("Demanda atribuída com sucesso!");
+      alert(taskToEdit ? "Atualizado com sucesso!" : "Atribuído com sucesso!");
       setIsOpen(false);
-
-      setFormData({
-        funcionario_id: "",
-        funcionario_nome: "",
-        descricao: "",
-        produto: "Planilha",
-        expected_time: "",
-        expected_date: "",
-        start_time: "",
-        end_time: "",
-        processo: "",
-        convenio: "",
-        convenente: "",
-      });
-
+      setTaskToEdit(null); 
       queryClient.invalidateQueries(["demandas"]);
       queryClient.invalidateQueries(["equipe"]);
     } catch (error) {
@@ -94,8 +53,8 @@ export default function NovaDemandaDialog() {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} className="bg-[#004785] hover:bg-[#003566] gap-2">
-        <Plus className="w-4 h-4" /> Atribuir Nova Demanda
+      <Button onClick={() => { setTaskToEdit(null); setIsOpen(true); }} className="bg-[#004785] hover:bg-[#003566] gap-2">
+        <Plus className="w-4 h-4" /> {taskToEdit ? "Editar Demanda" : "Atribuir Nova Demanda"}
       </Button>
 
       {isOpen && (

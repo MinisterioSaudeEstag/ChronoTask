@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 
-export default function DemandasRecentesTable({ demandas, isAdmin }) {
+export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
@@ -113,7 +113,11 @@ export default function DemandasRecentesTable({ demandas, isAdmin }) {
                   </td>
                   {isAdmin && (
                     <td className="px-4 py-3 text-center">
-                      <Button variant="ghost" size="sm" className="h-8 px-2">Editar</Button>
+                      <Button variant="ghost" size="sm" className="h-8 px-2"
+                      onClick={() => onEdit(item)}
+                      >
+                        Editar
+                      </Button>
                     </td>
                   )}
                 </tr>
