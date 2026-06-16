@@ -11,7 +11,7 @@ export default function Footer() {
              <span className="text-xs font-bold text-muted-foreground uppercase">Ministério da Saúde</span>
           </div>
           <p className="text-[10px] text-muted-foreground">
-            Diretoria de Tecnologia da Informação e Redes - <span className="font-semibold">DITRE/PE</span>
+            Divisão de Transferências de Recursos - <span className="font-semibold">DITRE/PE</span>
           </p>
         </div>
 
