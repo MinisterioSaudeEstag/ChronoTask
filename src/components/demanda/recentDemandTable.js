@@ -19,7 +19,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
   ];
 
-  const generateProcessLink = (numero) => `https://sei.saude.gov.br/processo/${numero}`;
+ const generateProcessLink = (numero) => `https://sei.saude.gov.br/processo!id/detalhe?id=${numero}`;
 
   async function handleStatusChange(taskId, newStatus) {
     setUpdatingId(taskId);
