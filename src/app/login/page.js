@@ -57,15 +57,6 @@ export default function LoginPage() {
           <p className="text-muted-foreground text-sm mt-2">Entre com seu e-mail institucional</p>
         </div>
 
-        <div className="space-y-6">
-
-          <div className="relative flex items-center justify-center">
-            <div className="border-t border-border w-full"></div>
-            <span className="absolute bg-white dark:bg-slate-900 px-3 text-xs text-muted-foreground uppercase font-medium">
-              ou use sua conta
-            </span>
-          </div>
-
           <form onSubmit={handleLogin} className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">E-mail</label>
@@ -114,6 +105,5 @@ export default function LoginPage() {
           </Link>
         </div>
       </div>
-    </div>
   );
 }
