@@ -22,32 +22,22 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   async function handleStatusChange(taskId, newStatus) {
     let observation = "";
-
     if (newStatus === "concluida") {
-      observation = window.prompt("Por favor, insira a observação de conclusão da demanda:");
-      if (observation === null) return; 
+      observation = window.prompt("Insira a observação de conclusão:");
+      if (observation === null) return;
       if (observation.trim() === "") {
-        toast.error("A observação é obrigatória para concluir a demanda!");
+        toast.error("Observação obrigatória!");
         return;
       }
     }
-
     setUpdatingId(taskId);
     try {
-      const { error } = await supabase
-        .from("tasks")
-        .update({ 
-          status: newStatus, 
-          observation: observation 
-        })
-        .eq("id", taskId);
-
+      const { error } = await supabase.from("tasks").update({ status: newStatus, observation }).eq("id", taskId);
       if (error) throw error;
-
-      toast.success("Status atualizado com sucesso!");
       queryClient.invalidateQueries(["demandas"]);
+      toast.success("Atualizado!");
     } catch (error) {
-      toast.error("Erro ao atualizar status: " + error.message);
+      toast.error("Erro: " + error.message);
     } finally {
       setUpdatingId(null);
     }
@@ -66,6 +56,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
               <th className="px-4 py-3">Funcionário</th>
               <th className="px-4 py-3">Demanda / Produto</th>
               <th className="px-4 py-3">Processo</th>
+              <th className="px-4 py-3">Convênio</th> 
               <th className="px-4 py-3">Início / Término</th>
               <th className="px-4 py-3">Carga Horária</th>
               <th className="px-4 py-3">Status</th>
@@ -74,32 +65,23 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
           </thead>
           <tbody className="divide-y divide-border/60">
             {demandas.length === 0 ? (
-              <tr>
-                <td colSpan="7" className="px-4 py-8 text-center text-muted-foreground">Nenhuma demanda encontrada.</td>
-              </tr>
+              <tr><td colSpan="8" className="px-4 py-8 text-center text-muted-foreground">Nenhuma demanda encontrada.</td></tr>
             ) : (
               demandas.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-4 py-3 font-medium">{item.funcionario_nome}</td>
                   <td className="px-4 py-3">
                     <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
-                    {item.observation && (
-                      <p className="text-[10px] italic text-emerald-600 dark:text-emerald-400 mt-1">
-                        Obs: {item.observation}
-                      </p>
-                    )}
+                    {item.observation && <p className="text-[10px] italic text-emerald-600 mt-1">Obs: {item.observation}</p>}
                     <p className="text-xs text-muted-foreground">{item.produto}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <button 
-                      onClick={() => {
-                        navigator.clipboard.writeText(item.processo);
-                        toast.success("Número do processo copiado!");
-                      }}
-                      className="flex items-center gap-1 text-primary hover:underline font-medium transition-all hover:scale-105"
-                    >
+                    <button onClick={() => { navigator.clipboard.writeText(item.processo); toast.success("Copiado!"); }} className="flex items-center gap-1 text-primary hover:underline font-medium">
                       {item.processo} <ExternalLink className="w-3 h-3" />
                     </button>
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium">
+                    {item.convenio || "-"}
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-xs">Início: {item.start_date}</p>
@@ -133,9 +115,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   </td>
                   {isAdmin && (
                     <td className="px-4 py-3 text-center">
-                      <Button variant="ghost" size="sm" className="h-8 px-2"
-                      onClick={() => onEdit(item)}
-                      >
+                      <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => onEdit(item)}>
                         Editar
                       </Button>
                     </td>

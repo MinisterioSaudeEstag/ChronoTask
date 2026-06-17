@@ -132,10 +132,10 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
                   <option value="Planilha">Planilha</option>
                   <option value="Documento">Documento</option>
                   <option value="Relatório">Relatório</option>
-                  <option value="Relatório">Parecer</option>
-                  <option value="Relatório">Nota Técnica</option>
-                  <option value="Relatório">Despacho</option>
-                  <option value="Relatório">Ofício</option>
+                  <option value="Parecer">Parecer</option>
+                  <option value="Nota Técnica">Nota Técnica</option>
+                  <option value="Despacho">Despacho</option>
+                  <option value="Ofício">Ofício</option>
                   <option value="Outro">Outro</option>
                 </select>
               </div>
