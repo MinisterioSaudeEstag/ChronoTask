@@ -1,15 +1,18 @@
 'use client';
 
-import React from "react";
+import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Clock, Calendar, FileText, ExternalLink, CheckCircle2 } from "lucide-react";
-import { toast } from 'sonner'; 
+import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
 
 export default function MinhasAtividades() {
   const { user } = useAuth();
+  const [concludingId, setConcludingId] = useState(null); 
+  const [observation, setObservation] = useState("");
 
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["my_tasks", user?.id],
@@ -24,6 +27,28 @@ export default function MinhasAtividades() {
     },
     enabled: !!user,
   });
+
+  async function handleCompleteTask(taskId) {
+    if (!observation.trim()) {
+      toast.error("Por favor, adicione uma observação de conclusão.");
+      return;
+    }
+
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ status: "concluida", observation: observation })
+        .eq("id", taskId);
+
+      if (error) throw error;
+
+      toast.success("Tarefa concluída com sucesso!");
+      setConcludingId(null);
+      setObservation("");
+    } catch (error) {
+      toast.error("Erro ao concluir: " + error.message);
+    }
+  }
 
   if (isLoading) return <div className="flex justify-center items-center h-screen text-muted-foreground">Carregando suas atividades...</div>;
 
@@ -76,6 +101,38 @@ export default function MinhasAtividades() {
                         <FileText className="w-3 h-3" /> Produto: {task.produto}
                       </p>
                     </div>
+
+                    {task.status !== "concluida" && (
+                      <div className="pt-4 border-t border-border/40">
+                        {concludingId === task.id ? (
+                          <div className="space-y-2 animate-in fade-in slide-in-from-top-2">
+                            <textarea 
+                              placeholder="Insira a observação de entrega..." 
+                              className="w-full p-2 text-xs border rounded-md bg-background outline-none focus:ring-1 focus:ring-[#004785]"
+                              value={observation}
+                              onChange={(e) => setObservation(e.target.value)}
+                              autoFocus
+                            />
+                            <div className="flex gap-2">
+                              <Button size="sm" onClick={() => handleCompleteTask(task.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white h-8 px-3 text-xs">
+                                Confirmar Conclusão
+                              </Button>
+                              <Button size="sm" variant="ghost" onClick={() => {setConcludingId(null); setObservation("");}} className="h-8 px-3 text-xs">
+                                Cancelar
+                              </Button>
+                            </div>
+                          </div>
+                        ) : (
+                          <Button 
+                            size="sm" 
+                            onClick={() => setConcludingId(task.id)} 
+                            className="w-full bg-emerald-600 hover:bg-emerald-700 text-white flex gap-2 h-9"
+                          >
+                            <CheckCircle2 className="w-4 h-4" /> Marcar como Concluída
+                          </Button>
+                        )}
+                      </div>
+                    )}
 
                     <div className="grid grid-cols-2 gap-4 pt-4 border-t border-border/40">
                       <div className="flex items-center gap-2 text-xs text-muted-foreground">

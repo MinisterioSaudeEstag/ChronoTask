@@ -21,15 +21,30 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   ];
 
   async function handleStatusChange(taskId, newStatus) {
+    let observation = "";
+
+    if (newStatus === "concluida") {
+      observation = window.prompt("Por favor, insira a observação de conclusão da demanda:");
+      if (observation === null) return; 
+      if (observation.trim() === "") {
+        toast.error("A observação é obrigatória para concluir a demanda!");
+        return;
+      }
+    }
+
     setUpdatingId(taskId);
     try {
       const { error } = await supabase
         .from("tasks")
-        .update({ status: newStatus })
+        .update({ 
+          status: newStatus, 
+          observation: observation 
+        })
         .eq("id", taskId);
 
       if (error) throw error;
 
+      toast.success("Status atualizado com sucesso!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
       toast.error("Erro ao atualizar status: " + error.message);
@@ -68,6 +83,11 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   <td className="px-4 py-3 font-medium">{item.funcionario_nome}</td>
                   <td className="px-4 py-3">
                     <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
+                    {item.observation && (
+                      <p className="text-[10px] italic text-emerald-600 dark:text-emerald-400 mt-1">
+                        Obs: {item.observation}
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">{item.produto}</p>
                   </td>
                   <td className="px-4 py-3">
