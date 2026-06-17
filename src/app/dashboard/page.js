@@ -108,11 +108,13 @@ export default function Dashboard() {
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {funcionariosEquipe.map(func => (
+              <div key={func.id} className="pointer-events-none">
               <FuncionarioCard
                 key={func.id}
                 nome={func.full_name}
                 demandas={demandas.filter(d => d.funcionario_id === func.id)}
               />
+              </div>
             ))}
           </div>
         </section>

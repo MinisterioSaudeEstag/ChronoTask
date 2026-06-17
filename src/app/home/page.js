@@ -5,12 +5,13 @@ import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
 import { Users, Clock, Calendar, FileText, User, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { toast } from 'sonner';
 
 export default function HomeEquipe() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
 
   const { data: equipe = [], isLoading: loadingEquipe } = useQuery({
-    queryKey: ["equipe"],
+    queryKey: ["equipe_list"],
     queryFn: async () => {
       const { data } = await supabase.from("profiles").select("*").neq("role", "admin");
       return data || [];
@@ -23,14 +24,14 @@ export default function HomeEquipe() {
       if (!selectedEmployee) return [];
       const { data } = await supabase
         .from("tasks")
-        .select("*, profiles(full_name)")
+        .select("*, profiles:admin_id(full_name)") 
         .eq("funcionario_id", selectedEmployee.id);
       return data || [];
     },
-    enabled: !!selectedEmployee, 
+    enabled: !!selectedEmployee,
   });
 
-  if (loadingEquipe) return <div className="flex justify-center items-center h-screen">Carregando equipe...</div>;
+  if (loadingEquipe) return <div className="flex justify-center items-center h-screen">Carregando...</div>;
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-8 space-y-8">
@@ -44,7 +45,7 @@ export default function HomeEquipe() {
           <Card 
             key={emp.id} 
             className="cursor-pointer hover:border-[#004785] transition-all group"
-            onClick={() => setSelectedEmployee(emp)} 
+            onClick={() => setSelectedEmployee(emp)}
           >
             <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
               <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-slate-100 group-hover:border-[#004785] transition-all">
@@ -70,14 +71,15 @@ export default function HomeEquipe() {
 
             <div className="p-6 overflow-x-auto">
               {loadingTasks ? (
-                <div className="flex justify-center py-10 text-muted-foreground">Carregando tarefas...</div>
+                <div className="flex justify-center py-10 text-muted-foreground">Buscando atividades...</div>
               ) : tasks.length === 0 ? (
-                <div className="text-center py-10 text-muted-foreground">Nenhuma atividade atribuída.</div>
+                <div className="text-center py-10 text-muted-foreground">Nenhuma atividade atribuída a este funcionário.</div>
               ) : (
                 <table className="w-full text-sm text-left">
                   <thead className="bg-slate-50 dark:bg-slate-800 text-muted-foreground uppercase text-[10px] font-bold">
                     <tr>
                       <th className="px-4 py-3">Atividade / Produto</th>
+                      <th className="px-4 py-3">Atribuído por</th>
                       <th className="px-4 py-3">Prazo / Hora</th>
                       <th className="px-4 py-3">Processo</th>
                       <th className="px-4 py-3">Convênio / Convte</th>
@@ -91,6 +93,9 @@ export default function HomeEquipe() {
                           <p className="font-semibold">{task.descricao}</p>
                           <p className="text-xs text-muted-foreground">{task.produto}</p>
                         </td>
+                        <td className="px-4 py-3 text-muted-foreground">
+                          {task.profiles?.full_name || "Admin"}
+                        </td>
                         <td className="px-4 py-3">
                           <div className="flex flex-col text-xs">
                             <span>{task.expected_date}</span>
@@ -98,16 +103,13 @@ export default function HomeEquipe() {
                           </div>
                         </td>
                         <td className="px-4 py-3">
-                          <button 
-                            onClick={() => { navigator.clipboard.writeText(task.processo); toast.success("Copiado!"); }}
-                            className="text-primary flex items-center gap-1 hover:underline"
-                          >
+                          <button onClick={() => { navigator.clipboard.writeText(task.processo); toast.success("Copiado!"); }} className="text-primary flex items-center gap-1 hover:underline">
                             {task.processo} <ExternalLink className="w-3 h-3" />
                           </button>
                         </td>
                         <td className="px-4 py-3 text-xs">
-                          <p><b>Conv:</b> {task.convenio || "-"}</p>
-                          <p><b>Convte:</b> {task.convenente || "-"}</p>
+                          <p><b className="opacity-60">Vínculo:</b> {task.conv_type || "Convênio"}</p>
+                          <p><b className="opacity-60">Nome:</b> {task.convenente || "-"}</p>
                         </td>
                         <td className="px-4 py-3">
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
