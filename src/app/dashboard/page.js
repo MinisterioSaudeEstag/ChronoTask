@@ -1,5 +1,5 @@
 "use client";
-import React from "react";
+import React, { useState } from "react"; 
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient"; 
@@ -10,20 +10,13 @@ import FuncionarioCard from "@/components/demanda/employeCard";
 import NovaDemandaDialog from "@/components/demanda/newDemandDialog";
 import DemandasRecentesTable from "@/components/demanda/recentDemandTable";
 
-const FUNCIONARIOS = [
-  "Arthur Vinícius",
-  "Matheus Nascimento",
-  "Ana Aparecida",
-  "Giselly Soares",
-  "Emilly Alves",
-  "Maria Luna"
-];
-
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
 
-  const { data: demandas = [], isLoading } = useQuery({
+  const [taskToEdit, setTaskToEdit] = useState(null);
+
+  const { data: demandas = [], isLoading: loadingDemandas } = useQuery({
     queryKey: ["demandas"],
     queryFn: async () => {
       const { data, error } = await supabase
@@ -38,6 +31,16 @@ export default function Dashboard() {
       return data;
     },
   });
+
+  const { data: funcionariosEquipe = [], isLoading: loadingEquipe } = useQuery({
+    queryKey: ["equipe_dashboard"],
+    queryFn: async () => {
+      const { data } = await supabase.from("profiles").select("id, full_name").neq("role", "admin");
+      return data || [];
+    },
+  });
+
+  const isLoading = loadingDemandas || loadingEquipe;
 
   const myDemandas = !isAdmin
     ? demandas.filter(d => d.funcionario_id === user?.id)
@@ -73,7 +76,12 @@ export default function Dashboard() {
             {isAdmin ? "Painel de controle de demandas da equipe" : "Suas demandas e atividades"}
           </p>
         </div>
-        {isAdmin && <NovaDemandaDialog />}
+        {isAdmin && (
+          <NovaDemandaDialog 
+            taskToEdit={taskToEdit} 
+            setTaskToEdit={setTaskToEdit} 
+          />
+        )}
       </div>
 
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
@@ -99,11 +107,11 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold text-foreground">Equipe</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {FUNCIONARIOS.map(nome => (
+            {funcionariosEquipe.map(func => (
               <FuncionarioCard
-                key={nome}
-                nome={nome}
-                demandas={demandas.filter(d => d.funcionario_nome === nome)}
+                key={func.id}
+                nome={func.full_name}
+                demandas={demandas.filter(d => d.funcionario_id === func.id)}
               />
             ))}
           </div>
@@ -111,7 +119,11 @@ export default function Dashboard() {
       )}
 
       <section>
-        <DemandasRecentesTable demandas={isAdmin ? demandas : myDemandas} isAdmin={isAdmin} />
+        <DemandasRecentesTable 
+          demandas={isAdmin ? demandas : myDemandas} 
+          isAdmin={isAdmin} 
+          onEdit={(task) => setTaskToEdit(task)}
+        />
       </section>
     </div>
   );
