@@ -1,11 +1,15 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
-
 export async function POST(req) {
   try {
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
     const { email, funcionarioNome, demanda, prazo } = await req.json();
+
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json({ error: "API Key do Resend não configurada" }, { status: 500 });
+    }
 
     const { data, error } = await resend.emails.send({
       from: 'ChronoTask <onboarding@resend.dev>', 
@@ -29,6 +33,7 @@ export async function POST(req) {
     if (error) throw error;
     return NextResponse.json({ success: true });
   } catch (error) {
+    console.error("Erro no envio de e-mail:", error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
