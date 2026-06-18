@@ -50,59 +50,65 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
   };
 
   async function handleSave(e) {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      const finalData = { ...formData };
-      if (finalData.produto === "Outro") {
-        finalData.convenio = "";
-        finalData.convenente = "";
-      }
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
 
-      if (taskToEdit) {
-        const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "pendente" }]);
-        if (error) throw error;
-      }
+    const finalData = { ...formData };
 
-        try {
-          const { data: empData } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('id', formData.funcionario_id)
-            .single();
-
-          if (empData?.email) {
-            await fetch('/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: empData.email,
-                funcionarioNome: formData.funcionario_nome,
-                demanda: formData.descricao,
-                prazo: formData.expected_date,
-              }),
-            });
-          }
-        } catch (emailError) {
-          console.error("Erro ao enviar e-mail de notificação:", emailError);
-        }
-
-      toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída!");
-      setIsOpen(false);
-      if (setTaskToEdit) setTaskToEdit(null); 
-      queryClient.invalidateQueries(["demandas"]);
-      queryClient.invalidateQueries(["equipe"]);
-    } catch (error) {
-      toast.error("Erro: " + error.message);
-    } finally {
-      setLoading(false);
+    if (finalData.expected_time === "") {
+      finalData.expected_time = null;
+    } else {
+      finalData.expected_time = parseFloat(finalData.expected_time);
     }
+
+    if (finalData.produto === "Outro") {
+      finalData.convenio = "";
+      finalData.convenente = "";
+    }
+
+    if (taskToEdit) {
+      const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
+      if (error) throw error;
+    } else {
+      const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "pendente" }]);
+      if (error) throw error;
+
+      try {
+        const { data: empData } = await supabase.from('profiles').select('email').eq('id', formData.funcionario_id).single();
+        if (empData?.email) {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: empData.email,
+              funcionarioNome: formData.funcionario_nome,
+              demanda: formData.descricao,
+              prazo: formData.expected_date,
+            }),
+          });
+        }
+      } catch (emailError) {
+        console.error("Erro no e-mail:", emailError);
+      }
+    }
+
+    toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída!");
+    setIsOpen(false);
+    if (setTaskToEdit) setTaskToEdit(null); 
+    queryClient.invalidateQueries(["demandas"]);
+    queryClient.invalidateQueries(["equipe"]);
+  } catch (error) {
+    if (error.message.includes("invalid input syntax for type numeric")) {
+      toast.error("Por favor, insira um número válido nas Horas Estimadas.");
+    } else {
+      toast.error("Erro: " + error.message);
+    }
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <>
