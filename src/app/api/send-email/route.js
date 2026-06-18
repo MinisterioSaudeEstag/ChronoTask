@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 
 export async function POST(req) {
   try {
+    // INSTANCIAÇÃO DENTRO DA FUNÇÃO: 
+    // Isso evita que o build da Vercel trave se a chave estiver ausente no momento da compilação
     const resend = new Resend(process.env.RESEND_API_KEY);
 
     const { email, funcionarioNome, demanda, prazo } = await req.json();
