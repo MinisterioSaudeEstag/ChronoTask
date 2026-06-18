@@ -69,6 +69,29 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
         if (error) throw error;
       }
 
+        try {
+          const { data: empData } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', formData.funcionario_id)
+            .single();
+
+          if (empData?.email) {
+            await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: empData.email,
+                funcionarioNome: formData.funcionario_nome,
+                demanda: formData.descricao,
+                prazo: formData.expected_date,
+              }),
+            });
+          }
+        } catch (emailError) {
+          console.error("Erro ao enviar e-mail de notificação:", emailError);
+        }
+
       toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída!");
       setIsOpen(false);
       if (setTaskToEdit) setTaskToEdit(null); 
