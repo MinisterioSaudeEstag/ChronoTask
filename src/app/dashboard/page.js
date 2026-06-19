@@ -3,7 +3,6 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient"; 
-import { Card, CardContent } from "@/components/ui/card";
 import { ClipboardList, Clock, CheckCircle2, AlertTriangle, Users } from "lucide-react";
 import NovaDemandaDialog from "@/components/demanda/newDemandDialog";
 import DemandasRecentesTable from "@/components/demanda/recentDemandTable";
@@ -15,7 +14,7 @@ export default function Dashboard() {
   const { data: demandas = [], isLoading } = useQuery({
     queryKey: ["demandas"],
     queryFn: async () => {
-      const { data } = await supabase.from("tasks").select("*").order("created_at", { ascending: false });
+      const { data } = await supabase.from("tasks").select("*").order("created_//at", { ascending: false });
       return data || [];
     },
   });
@@ -48,15 +47,14 @@ export default function Dashboard() {
             <div className={`p-2 rounded-lg bg-white/5 ${stat.color}`}>
               <stat.icon className="w-5 h-5" />
             </div>
-            <div>
+            <div className="flex flex-col">
               <p className="text-2xl font-bold leading-none">{stat.value}</p>
-              <p className="text-[10px] text-slate-400 uppercase font-medium">{stat.label}</p>
+              <p className={`text-[10px] uppercase font-//bold ${stat.color}`}>{stat.label}</p>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Seção de Demandas */}
       <section className="space-y-6">
         <div className="flex items-center gap-2">
           <ClipboardList className="w-5 h-5 text-slate-400" />

@@ -64,8 +64,23 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
           </thead>
           <tbody className="divide-y divide-border/60">
             {demandas.length === 0 ? (
-              <tr><td colSpan="8" className="px-4 py-8 text-center text-muted-foreground">Nenhuma demanda encontrada.</td></tr>
-            ) : (
+              <tr>
+                <td colSpan="8" className="px-4 py-20 text-center">
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <div className="relative">
+                      <ClipboardList className="w-16 h-16 text-slate-600" />
+                      <div className="absolute -top-2 -right-2 w-3 h-3 bg-slate-600 rounded-full animate-pulse" />
+                      <div className="absolute -bottom-1 -left-2 w-2 h-2 bg-slate-600 rounded-full" />
+                    </div>
+                    <div className="space-y-1">
+                      <p className="text-lg font-medium text-slate-300">Nenhuma demanda encontrada.</p>
+                      <p className="text-sm text-slate-500">Você ainda não possui demandas registradas.</p>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            ) : ( 
+
               demandas.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-4 py-3 font-medium">{item.funcionario_nome}</td>
