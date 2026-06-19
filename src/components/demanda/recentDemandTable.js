@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import { ExternalLink, Clock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { ExternalLink, Clock, Loader2, ClipboardList } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
