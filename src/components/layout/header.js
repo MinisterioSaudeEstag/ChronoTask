@@ -16,7 +16,7 @@ export default function Header() {
   if (pathname === "/") return null;
 
   return (
-    <header className="h-16 border-b border-white/5 bg-darkBg text-white px-6 flex items-center justify-between">
+    <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-darkBg text-slate-900 dark:text-white px-6 flex items-center justify-between transition-colors duration-300">
       <div className="flex items-center gap-6">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="flex items-center gap-2">

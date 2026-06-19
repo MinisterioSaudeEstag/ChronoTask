@@ -54,21 +54,22 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-darkBg text-white px-6 py-12 space-y-12">
+    <div className="min-h-screen bg-slate-50 dark:bg-darkBg text-slate-900 dark:text-white px-6 py-12 space-y-12 transition-colors duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">
             Olá, {user?.full_name?.split(" ")[0] || "Usuário"} 👋
           </h1>
-          <p className="text-slate-400 text-sm">Seus dados e atividades em um só lugar</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">Seus dados e atividades em um só lugar</p>
         </div>
         {isAdmin && <NovaDemandaDialog />}
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {stats.map(stat => (
-          <div key={stat.label} className="bg-darkCard border border-white/5 p-4 rounded-xl flex items-center gap-4 shadow-sm">
-            <div className={`p-2 rounded-lg bg-white/5 ${stat.color}`}>
+          // bg-white (Modo Claro) | dark:bg-darkCard (Modo Escuro)
+          <div key={stat.label} className="bg-white dark:bg-darkCard border border-slate-200 dark:border-white/5 p-4 rounded-xl flex items-center gap-4 shadow-sm transition-colors">
+            <div className={`p-2 rounded-lg bg-slate-100 dark:bg-white/5 ${stat.color}`}>
               <stat.icon className="w-5 h-5" />
             </div>
             <div className="flex flex-col">
@@ -85,7 +86,8 @@ export default function Dashboard() {
           <h2 className="text-lg font-semibold">Demandas Recentes</h2>
         </div>
         
-        <div className="bg-darkCard border border-white/5 rounded-xl overflow-hidden shadow-xl">
+        {/* Adaptativo: bg-white no claro, darkCard no escuro */}
+        <div className="bg-white dark:bg-darkCard border border-slate-200 dark:border-white/5 rounded-xl overflow-hidden shadow-xl transition-colors">
           <DemandasRecentesTable demandas={isAdmin ? demandas : myDemandas} isAdmin={isAdmin} />
         </div>
       </section>
