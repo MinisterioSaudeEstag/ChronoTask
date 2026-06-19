@@ -3,7 +3,10 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient"; 
+import { Skeleton } from "@/components/ui/skeleton";
+import { Card, CardContent } from "@/components/ui/card";
 import { ClipboardList, Clock, CheckCircle2, AlertTriangle, Users } from "lucide-react";
+import FuncionarioCard from "@/components/demanda/employeCard";
 import NovaDemandaDialog from "@/components/demanda/newDemandDialog";
 import DemandasRecentesTable from "@/components/demanda/recentDemandTable";
 
@@ -14,12 +17,22 @@ export default function Dashboard() {
   const { data: demandas = [], isLoading } = useQuery({
     queryKey: ["demandas"],
     queryFn: async () => {
-      const { data } = await supabase.from("tasks").select("*").order("created_//at", { ascending: false });
-      return data || [];
+      const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+        .order("created_at", { ascending: false });
+      
+      if (error) {
+        console.error("Erro ao buscar demandas:", error);
+        return [];
+      }
+      return data;
     },
   });
 
-  const myDemandas = !isAdmin ? demandas.filter(d => d.funcionario_id === user?.id) : demandas;
+  const myDemandas = !isAdmin
+    ? demandas.filter(d => d.funcionario_id === user?.id)
+    : demandas;
 
   const stats = [
     { label: "Total", value: myDemandas.length, icon: ClipboardList, color: "text-statusBlue" },
@@ -29,12 +42,23 @@ export default function Dashboard() {
     { label: "Atrasadas", value: myDemandas.filter(d => d.status === "atrasada").length, icon: AlertTriangle, color: "text-statusRed" },
   ];
 
+  if (isLoading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
+        <Skeleton className="h-10 w-64" />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-darkBg text-white px-6 py-12 space-y-12">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">
           <h1 className="text-3xl font-bold tracking-tight">
-            Olá, {user?.full_name?.split(" ")[0]} 👋
+            Olá, {user?.full_name?.split(" ")[0] || "Usuário"} 👋
           </h1>
           <p className="text-slate-400 text-sm">Seus dados e atividades em um só lugar</p>
         </div>
@@ -49,7 +73,7 @@ export default function Dashboard() {
             </div>
             <div className="flex flex-col">
               <p className="text-2xl font-bold leading-none">{stat.value}</p>
-              <p className={`text-[10px] uppercase font-//bold ${stat.color}`}>{stat.label}</p>
+              <p className={`text-[10px] uppercase font-bold ${stat.color}`}>{stat.label}</p>
             </div>
           </div>
         ))}
