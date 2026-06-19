@@ -1,9 +1,8 @@
 'use client';
 
 import React, { useState } from "react";
-import { ExternalLink, Clock, Loader2 } from "lucide-react";
+import { ExternalLink, Clock, Loader2, ClipboardList } from "lucide-react"; 
 import { Button } from "@/components/ui/button";
-import { ExternalLink, Clock, Loader2, ClipboardList } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
@@ -24,21 +23,27 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   async function handleStatusChange(taskId, newStatus) {
     let observation = "";
     if (newStatus === "concluida") {
-      observation = window.prompt("Insira a observação de conclusão:");
+      observation = window.prompt("Por favor, insira a observação de conclusão da demanda:");
       if (observation === null) return;
       if (observation.trim() === "") {
-        toast.error("Observação obrigatória!");
+        toast.error("A observação é obrigatória para concluir a demanda!");
         return;
       }
     }
+
     setUpdatingId(taskId);
     try {
-      const { error } = await supabase.from("tasks").update({ status: newStatus, observation }).eq("id", taskId);
+      const { error } = await supabase
+        .from("tasks")
+        .update({ status: newStatus, observation })
+        .eq("id", taskId);
+
       if (error) throw error;
+
+      toast.success("Status atualizado com sucesso!");
       queryClient.invalidateQueries(["demandas"]);
-      toast.success("Atualizado!");
     } catch (error) {
-      toast.error("Erro: " + error.message);
+      toast.error("Erro ao atualizar status: " + error.message);
     } finally {
       setUpdatingId(null);
     }
@@ -52,13 +57,14 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
       <div className="overflow-x-auto rounded-xl border border-border/60 bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left">
-          <thead className="bg-white/5 text-slate-400 uppercase text-[10px] font-bold">
+          <thead className="bg-slate-50 dark:bg-slate-800 text-muted-foreground uppercase text-[10px] font-bold">
             <tr className="border-b border-white/5">
-              <th className="px-4 py-4">Nº Demanda</th>
-              <th className="px-4 py-4">Demandante / Projeto</th>
-              <th className="px-4 py-4">Processo SEI</th>
-              <th className="px-4 py-3">COTRE/PE</th>
-              <th className="px-4 py-3">DITRE/PE</th>
+              <th className="px-4 py-3">Funcionário</th>
+              <th className="px-4 py-3">Demanda / Produto</th>
+              <th className="px-4 py-3">Processo</th>
+              <th className="px-4 py-3">Convênio</th>
+              <th className="px-4 py-3">Início / Término</th>
+              <th className="px-4 py-3">Carga Horária</th>
               <th className="px-4 py-3">Status</th>
               {isAdmin && <th className="px-4 py-3 text-center">Ações</th>}
             </tr>
@@ -71,7 +77,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     <div className="relative">
                       <ClipboardList className="w-16 h-16 text-slate-600" />
                       <div className="absolute -top-2 -right-2 w-3 h-3 bg-slate-600 rounded-full animate-pulse" />
-                      <div className="absolute -bottom-1 -left-2 w-2 h-2 bg-slate-600 rounded-full" />
                     </div>
                     <div className="space-y-1">
                       <p className="text-lg font-medium text-slate-300">Nenhuma demanda encontrada.</p>
@@ -80,18 +85,27 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   </div>
                 </td>
               </tr>
-            ) : ( 
-
+            ) : (
               demandas.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-4 py-3 font-medium">{item.funcionario_nome}</td>
                   <td className="px-4 py-3">
                     <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
-                    {item.observation && <p className="text-[10px] italic text-emerald-600 mt-1">Obs: {item.observation}</p>}
+                    {item.observation && (
+                      <p className="text-[10px] italic text-emerald-600 dark:text-emerald-400 mt-1">
+                        Obs: {item.observation}
+                      </p>
+                    )}
                     <p className="text-xs text-muted-foreground">{item.produto}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <button onClick={() => { navigator.clipboard.writeText(item.processo); toast.success("Copiado!"); }} className="flex items-center gap-1 text-primary hover:underline font-medium">
+                    <button 
+                      onClick={() => {
+                        navigator.clipboard.writeText(item.processo);
+                        toast.success("Número do processo copiado!");
+                      }}
+                      className="flex items-center gap-1 text-primary hover:underline font-medium transition-all hover:scale-105"
+                    >
                       {item.processo} <ExternalLink className="w-3 h-3" />
                     </button>
                   </td>
@@ -114,7 +128,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           <Loader2 className="w-3 h-3 animate-spin text-primary" />
                         </div>
                       )}
-                      <select
+                      <select 
                         value={item.status}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
                         disabled={updatingId === item.id || (!isAdmin && item.funcionario_id !== user?.id)}
