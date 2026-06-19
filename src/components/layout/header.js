@@ -37,7 +37,7 @@ export default function Header() {
           <Link href="/minhas-atividades" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
-          <Link href="/home" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? 'text-white font-bold' : 'text-slate-400 hover:text-white'}`}>
+          <Link href="/home" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? 'font-bold' : 'text-slate-400 hover:text-white'}`}>
             <LayoutDashboard className="w-4 h-4" /> Equipe
           </Link>
           <Link href="/relatorios" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">

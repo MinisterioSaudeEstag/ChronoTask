@@ -9,6 +9,7 @@ export function useDarkMode() {
 
     if (savedTheme === "dark" || (!savedTheme && systemPrefersDark)) {
       setIsDark(true);
+      // Força a aplicação da classe no elemento raiz
       document.documentElement.classList.add("dark");
     } else {
       setIsDark(false);

@@ -1,6 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: 'class', // ESSENCIAL para o botão de modo escuro funcionar
+  darkMode: 'class', // Mantenha isso!
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -10,8 +10,10 @@ module.exports = {
     extend: {
       colors: {
         primary: "#004785",
-        darkBg: "#0f172a",     // Azul Profundo (Modo Escuro)
-        darkCard: "#1e293b",   // Azul Card (Modo Escuro)
+        // NOVA PALETA ADAPTATIVA
+        cream: "#fdfbf7",    // Bege bem claro para não cansar a vista
+        darkBg: "#0f172a",    // Azul Profundo
+        darkCard: "#1e293b",  // Azul Card
         statusBlue: "#3b82f6",
         statusYellow: "#eab308",
         statusCyan: "#06b6d4",

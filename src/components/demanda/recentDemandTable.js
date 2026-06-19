@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { ExternalLink, Clock, Loader2, ClipboardList } from "lucide-react"; 
+import { ExternalLink, Clock, Loader2, ClipboardList } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -51,9 +51,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Demandas Recentes</h2>
-      </div>
 
       <div className="overflow-x-auto rounded-xl border border-border/60 bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left">
@@ -99,7 +96,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     <p className="text-xs text-muted-foreground">{item.produto}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <button 
+                    <button
                       onClick={() => {
                         navigator.clipboard.writeText(item.processo);
                         toast.success("Número do processo copiado!");
@@ -128,7 +125,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           <Loader2 className="w-3 h-3 animate-spin text-primary" />
                         </div>
                       )}
-                      <select 
+                      <select
                         value={item.status}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
                         disabled={updatingId === item.id || (!isAdmin && item.funcionario_id !== user?.id)}
@@ -144,7 +141,12 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   </td>
                   {isAdmin && (
                     <td className="px-4 py-3 text-center">
-                      <Button variant="ghost" size="sm" className="h-8 px-2" onClick={() => onEdit(item)}>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 cursor-pointer hover:bg-slate-100 dark:hover:bg-white/10 transition-all"
+                        onClick={() => onEdit(item)}
+                      >
                         Editar
                       </Button>
                     </td>
