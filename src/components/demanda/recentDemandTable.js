@@ -51,14 +51,13 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
       <div className="overflow-x-auto rounded-xl border border-border/60 bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left">
-          <thead className="bg-slate-50 dark:bg-slate-800 text-muted-foreground uppercase text-[10px] font-bold">
-            <tr>
-              <th className="px-4 py-3">Funcionário</th>
-              <th className="px-4 py-3">Demanda / Produto</th>
-              <th className="px-4 py-3">Processo</th>
-              <th className="px-4 py-3">Convênio</th> 
-              <th className="px-4 py-3">Início / Término</th>
-              <th className="px-4 py-3">Carga Horária</th>
+          <thead className="bg-white/5 text-slate-400 uppercase text-[10px] font-bold">
+            <tr className="border-b border-white/5">
+              <th className="px-4 py-4">Nº Demanda</th>
+              <th className="px-4 py-4">Demandante / Projeto</th>
+              <th className="px-4 py-4">Processo SEI</th>
+              <th className="px-4 py-3">COTRE/PE</th>
+              <th className="px-4 py-3">DITRE/PE</th>
               <th className="px-4 py-3">Status</th>
               {isAdmin && <th className="px-4 py-3 text-center">Ações</th>}
             </tr>
@@ -99,7 +98,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           <Loader2 className="w-3 h-3 animate-spin text-primary" />
                         </div>
                       )}
-                      <select 
+                      <select
                         value={item.status}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
                         disabled={updatingId === item.id || (!isAdmin && item.funcionario_id !== user?.id)}

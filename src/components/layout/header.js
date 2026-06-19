@@ -13,79 +13,49 @@ export default function Header() {
   const { user } = useAuth();
   const { isDark, toggleTheme } = useDarkMode();
 
-  if (pathname === "/") {
-    return null;
-  }
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    window.location.href = "/login";
-  }
+  if (pathname === "/") return null;
 
   return (
- <header className="h-20 border-b border-border/60 bg-white dark:bg-slate-900 sticky top-0 z-40 px-4 sm:px-6 flex items-center justify-between">
+    <header className="h-16 border-b border-white/10 bg-darkBg text-white px-6 flex items-center justify-between">
       <div className="flex items-center gap-6">
-        <Link href="/dashboard" className="flex items-center gap-4">
+        <Link href="/dashboard" className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <img src="/logo-ms.jpg" alt="Ministério da Saúde" className="h-12 w-auto object-contain" />
-            <img src="/logo-sus.png" alt="SUS" className="h-12 w-auto object-contain" />
+            <img src="/logo-sus.png" alt="SUS" className="h-8 w-auto" />
+            <img src="/logo-ms.png" alt="MS" className="h-8 w-auto" />
           </div>
-          
-          <div className="h-10 w-[1px] bg-border mx-2" /> 
-          
+          <div className="h-8 w-[1px] bg-white/20 mx-2" />
           <div className="flex flex-col">
-            <span className="font-bold text-xl tracking-tight text-[#004785] leading-none">
-              ChronoTask
-            </span>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-              DITRE / PE
-            </span>
+            <span className="font-bold text-lg leading-none">ChronoTask</span>
+            <span className="text-[9px] text-slate-400 uppercase font-medium">COTRE/PE | DITRE/PE</span>
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-4">
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-[#004785] transition-colors">
-            <LayoutDashboard className="w-4 h-4" /> Home
-          </Link>
-          <Link href="/minhas-atividades" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-[#004785] transition-colors">
-            <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
-          </Link>
-          <Link href="/home" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-[#004785] transition-colors">
+        <nav className="hidden md:flex items-center gap-6 ml-8">
+          <Link href="/home" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors">
             <Users className="w-4 h-4" /> Equipe
           </Link>
-          <Link href="/relatorios" className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-[#004785] transition-colors">
+          <Link href="/minhas-atividades" className="flex items-center gap-2 text-sm text-slate-300 hover:text-white transition-colors">
+            <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
+          </Link>
+          <Link href="/dashboard" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? 'text-white font-bold' : 'text-slate-300 hover:text-white'}`}>
+            <LayoutDashboard className="w-4 h-4" /> Home
+          </Link>
+          <Link href="/relatorios" className="flex items-//center gap-2 text-sm text-slate-300 hover:text-white transition-colors">
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
         </nav>
       </div>
 
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={toggleTheme}
-          className="rounded-full w-10 h-10 p-0"
-        >
+      <div className="flex items-center gap-4">
+        <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/10 transition-colors">
           {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-        </Button>
-
-        <div className="flex items-center gap-3 pl-3 border-l border-border/60">
-          <div className="text-right hidden sm:block">
-            <p className="text-sm font-semibold text-foreground leading-none">{user?.full_name}</p>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold">{user?.role}</p>
-          </div>
-          <Link href="/profile">
-            <div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden border-2 border-[#004785] cursor-pointer">
-              {user?.avatar_url ? (
-                <img src={user.avatar_url} alt="Perfil" className="w-full h-full object-cover" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#004785] font-bold">
-                  {user?.full_name?.charAt(0)}
-                </div>
-              )}
-            </div>
+        </button>
+        <div className="flex items-center gap-3 pl-4 border-l border-white/10">
+          <Link href="/profile" className="flex items-center gap-2 hover:text-white transition-colors">
+            <User className="w-4 h-4" />
+            <span className="text-sm font-medium">{user?.full_name?.split(" ")[0]}</span>
           </Link>
-          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-red-500 hover:text-red-600 p-2">
+          <Button variant="ghost" onClick={() => supabase.auth.signOut()} className="text-slate-400 hover:text-white p-2">
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
