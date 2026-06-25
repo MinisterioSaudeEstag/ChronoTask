@@ -133,8 +133,8 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
                 </select>
               </div>
               <div className="space-y-2">
-                <label className="text-xs font-medium">Número do Processo</label>
-                <input name="processo" value={formData.processo} placeholder="0000.000/0000-00" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} required />
+                <label className="text-xs font-medium">Número do Processo (Opcional)</label>
+                <input name="processo" value={formData.processo} placeholder="0000.000/0000-00" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange}/>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Tipo de Produto</label>
