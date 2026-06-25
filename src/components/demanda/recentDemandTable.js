@@ -12,7 +12,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
-  const [deletingId, setDeletingId] = useState(null); 
+  const [deletingId, setDeletingId] = useState(null);
 
   const STATUS_OPTIONS = [
     { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
@@ -23,7 +23,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   async function handleAddObservation(taskId) {
     const observation = window.prompt("Insira a observação ou devolutiva da demanda:");
-    if (observation === null) return; 
+    if (observation === null) return;
     if (observation.trim() === "") return;
 
     try {
@@ -93,9 +93,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Demandas Recentes</h2>
-      </div>
 
       <div className="overflow-x-auto rounded-xl border border-border/60 bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left">
@@ -132,15 +129,24 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <button 
-                      onClick={() => {
-                        navigator.clipboard.writeText(item.processo);
-                        toast.success("Número do processo copiado!");
-                      }}
-                      className="flex items-center gap-1 text-primary hover:underline font-medium transition-all hover:scale-105"
-                    >
-                      {item.processo} <ExternalLink className="w-3 h-3" />
-                    </button>
+                    {item.processo && item.processo.length >= 4 && item.processo !== "0000000" ? (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.processo);
+                          toast.success("Número do processo copiado!");
+                        }}
+                        className="flex items-center gap-1 text-primary hover:underline font-medium transition-all hover:scale-105"
+                      >
+                        {item.processo} <ExternalLink className="w-3 h-3" />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-slate-400 text-xs italic">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                          <line x1="5" y1="12" x2="19" y2="12"></line>
+                        </svg>
+                        Não informado
+                      </span>
+                    )}
                   </td>
                   <td className="px-4 py-3 text-xs font-medium">
                     {item.convenio ? `${item.convenio} ${item.conv_year ? `| ${item.conv_year}` : ""}` : "-"}
@@ -151,10 +157,10 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 text-muted-foreground">
-                      <Clock className="w-3 h-3" /> 
+                      <Clock className="w-3 h-3" />
                       <span className="font-medium">
-                        {(item.expected_time !== null && item.expected_time !== undefined && item.expected_time !== "") 
-                          ? `${item.expected_time}h` 
+                        {(item.expected_time !== null && item.expected_time !== undefined && item.expected_time !== "")
+                          ? `${item.expected_time}h`
                           : "-"}
                       </span>
                     </div>
@@ -166,7 +172,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           <Loader2 className="w-3 h-3 animate-spin text-primary" />
                         </div>
                       )}
-                      <select 
+                      <select
                         value={item.status}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
                         disabled={updatingId === item.id || (!isAdmin && item.funcionario_id !== user?.id)}
@@ -182,10 +188,10 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   </td>
                   <td className="px-4 py-3 flex justify-center gap-2">
                     {!isAdmin && (
-                      <Button 
-                        variant="ghost" 
-                        size="sm" 
-                        className="h-8 px-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all cursor-pointer" 
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all cursor-pointer"
                         onClick={() => handleAddObservation(item.id)}
                       >
                         <MessageSquare className="w-3 h-3 mr-1" /> obs
@@ -198,11 +204,11 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           Editar
                         </Button>
 
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
                           disabled={deletingId === item.id}
-                          className="h-8 px-2 bg-red-500/10 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer" 
+                          className="h-8 px-2 bg-red-500/10 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer"
                           onClick={() => handleDelete(item.id, item.descricao)}
                         >
                           {deletingId === item.id ? (

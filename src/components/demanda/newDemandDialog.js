@@ -173,7 +173,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
               </div>
               
               <div className="space-y-2 md:col-span-2">
-                <label className="text-xs font-medium">Número do {formData.conv_type} e Ano</label>
+                <label className="text-xs font-medium">Número do {formData.conv_type}</label>
                 <div className="flex gap-2">
                   <input name="convenio" placeholder="Nº Convênio/TED" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenio} />
                   <input name="conv_year" placeholder="Ano" className="w-24 p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.conv_year} />
