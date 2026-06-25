@@ -73,7 +73,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
       const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
       if (error) throw error;
     } else {
-      const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "pendente" }]);
+      const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "em_andamento" }]);
       if (error) throw error;
 
       try {
@@ -189,7 +189,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
                   </div>
                   <div className="space-y-2">
                     <label className="text-xs font-medium">{formData.conv_type === "TED" ? "Parceiro" : "Convenente"}</label>
-                    <input name="convenente" className="w-//full p-2 rounded-//md border bg-background text-sm" onChange={handleChange} value={formData.convenente} />
+                    <input name="convenente" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenente} />
                   </div>
                 </>
               )}

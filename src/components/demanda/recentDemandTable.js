@@ -22,7 +22,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   async function handleAddObservation(taskId) {
     const observation = window.prompt("Insira a observação ou devolutiva da demanda:");
-    if (observation === null) return; 
+    if (observation === null) return;
     if (observation.trim() === "") return;
 
     try {
@@ -126,7 +126,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     </button>
                   </td>
                   <td className="px-4 py-3 text-xs font-medium">
-                    {item.convenio || "-"}
+                    {item.convenio ? `${item.convenio} ${item.conv_year ? `| ${item.conv_year}` : ""}` : "-"}
                   </td>
                   <td className="px-4 py-3">
                     <p className="text-xs">Início: {item.start_date}</p>
@@ -134,7 +134,8 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 text-muted-foreground">
-                      <Clock className="w-3 h-3" /> {item.expected_time}h
+                      <Clock className="w-3 h-3" /> {item.expected_time}
+                      <span>{item.expected_time ? `${item.expected_time}h` : "-"}</span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -170,6 +171,14 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </Button>
                     </td>
                   )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 px-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all cursor-pointer"
+                    onClick={() => handleAddObservation(item.id)}
+                  >
+                    <MessageSquare className="w-3 h-3 mr-1" /> obs
+                  </Button>
                 </tr>
               ))
             )}
