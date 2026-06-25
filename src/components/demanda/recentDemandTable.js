@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { ExternalLink, Clock, Loader2, MessageSquare } from "lucide-react";
+import { ExternalLink, Clock, Loader2, MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -12,6 +12,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null); 
 
   const STATUS_OPTIONS = [
     { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
@@ -67,6 +68,29 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     }
   }
 
+  async function handleDelete(taskId, taskDescricao) {
+    const confirmar = window.confirm(`Tem certeza que deseja EXCLUIR a demanda "${taskDescricao}"?\n\nEsta ação não pode ser desfeita.`);
+    if (!confirmar) return;
+
+    try {
+      setDeletingId(taskId);
+      const { error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskId);
+
+      if (error) throw error;
+
+      toast.success("Demanda excluída com sucesso!");
+      queryClient.invalidateQueries(["demandas"]);
+      queryClient.invalidateQueries(["equipe"]);
+    } catch (error) {
+      toast.error("Erro ao deletar: " + error.message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
+
   return (
     <section className="space-y-4">
       <div className="flex items-center justify-between">
@@ -98,7 +122,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   <td className="px-4 py-3 font-medium">{item.funcionario_nome}</td>
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
-                      <p className="font-medium truncate .max-w-[200px]">{item.descricao}</p>
+                      <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
                       {item.observation && (
                         <div className="flex items-start gap-1 text-[10px] italic text-emerald-600 dark:text-emerald-400">
                           <MessageSquare className="w-3 h-3 mt-0.5" /> {item.observation}
@@ -136,7 +160,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     </div>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="relative .max-w-[140px]">
+                    <div className="relative max-w-[140px]">
                       {updatingId === item.id && (
                         <div className="absolute inset-0 bg-white/50 dark:bg-slate-900/50 flex items-center justify-center z-10">
                           <Loader2 className="w-3 h-3 animate-spin text-primary" />
@@ -157,12 +181,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     </div>
                   </td>
                   <td className="px-4 py-3 flex justify-center gap-2">
-                    {isAdmin && (
-                      <Button variant="ghost" size="sm" className="h-8 px-2 cursor-pointer" onClick={() => onEdit(item)}>
-                        Editar
-                      </Button>
-                    )}
-                    
                     {!isAdmin && (
                       <Button 
                         variant="ghost" 
@@ -172,6 +190,28 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       >
                         <MessageSquare className="w-3 h-3 mr-1" /> obs
                       </Button>
+                    )}
+
+                    {isAdmin && (
+                      <>
+                        <Button variant="ghost" size="sm" className="h-8 px-2 cursor-pointer" onClick={() => onEdit(item)}>
+                          Editar
+                        </Button>
+
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          disabled={deletingId === item.id}
+                          className="h-8 px-2 bg-red-500/10 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer" 
+                          onClick={() => handleDelete(item.id, item.descricao)}
+                        >
+                          {deletingId === item.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3 h-3" />
+                          )}
+                        </Button>
+                      </>
                     )}
                   </td>
                 </tr>

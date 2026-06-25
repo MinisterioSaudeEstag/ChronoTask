@@ -51,65 +51,43 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
   };
 
   async function handleSave(e) {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const finalData = { ...formData };
 
-    const finalData = { ...formData };
-
-    if (finalData.expected_time === "") {
-      finalData.expected_time = null;
-    } else {
-      finalData.expected_time = parseFloat(finalData.expected_time);
-    }
-
-    if (finalData.produto === "Outro") {
-      finalData.convenio = "";
-      finalData.convenente = "";
-    }
-
-    if (taskToEdit) {
-      const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
-      if (error) throw error;
-    } else {
-      const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "em_andamento" }]);
-      if (error) throw error;
-
-      try {
-        const { data: empData } = await supabase.from('profiles').select('email').eq('id', formData.funcionario_id).single();
-        if (empData?.email) {
-          await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: empData.email,
-              funcionarioNome: formData.funcionario_nome,
-              demanda: formData.descricao,
-              prazo: formData.expected_date,
-            }),
-          });
-        }
-      } catch (emailError) {
-        console.error("Erro no e-mail:", emailError);
+      if (finalData.expected_time === "") {
+        finalData.expected_time = null;
+      } else {
+        finalData.expected_time = parseFloat(finalData.expected_time);
       }
-    }
 
-    toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída!");
-    setIsOpen(false);
-    if (setTaskToEdit) setTaskToEdit(null); 
-    queryClient.invalidateQueries(["demandas"]);
-    queryClient.invalidateQueries(["equipe"]);
-  } catch (error) {
-    if (error.message.includes("invalid input syntax for type numeric")) {
-      toast.error("Por favor, insira um número válido nas Horas Estimadas.");
-    } else {
+      if (finalData.produto === "Outro") {
+        finalData.convenio = "";
+        finalData.conv_year = "";
+        finalData.convenente = "";
+      }
+
+      if (taskToEdit) {
+        const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
+        if (error) throw error;
+      } else {
+        const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "em_andamento" }]);
+        if (error) throw error;
+      }
+
+      toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída!");
+      setIsOpen(false);
+      if (setTaskToEdit) setTaskToEdit(null); 
+      queryClient.invalidateQueries(["demandas"]);
+      queryClient.invalidateQueries(["equipe"]);
+    } catch (error) {
       toast.error("Erro: " + error.message);
+    } finally {
+      setLoading(false);
     }
-  } finally {
-    setLoading(false);
   }
-}
 
   return (
     <>
@@ -139,7 +117,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Tipo de Produto</label>
-                <select name="produto" value={formData.produto} onChange={handleChange} className="w-//full p-2 rounded-md border bg-background text-sm">
+                <select name="produto" value={formData.produto} onChange={handleChange} className="w-full p-2 rounded-md border bg-background text-sm">
                   <option value="Planilha">Planilha</option>
                   <option value="Documento">Documento</option>
                   <option value="Relatório">Relatório</option>
@@ -157,41 +135,56 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
               </div>
 
               <div className="space-y-2">
+                <label className="text-xs font-medium">Carga Horária (Estimada)</label>
+                <input 
+                  name="expected_time" 
+                  type="number" 
+                  placeholder="Ex: 2" 
+                  value={formData.expected_time} 
+                  className="w-full p-2 rounded-md border bg-background text-sm" 
+                  onChange={handleChange} 
+                />
+              </div>
+
+              <div className="space-y-2">
                 <label className="text-xs font-medium">Data de Início</label>
                 <input name="start_date" type="date" value={formData.start_date} className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} />
               </div>
+              <div className="space-y-2">
+                <label className="text-xs font-medium">Prazo (Data Esperada)</label>
+                <input name="expected_date" type="date" value={formData.expected_date} className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} required />
+              </div>
+
               <div className="space-y-2">
                 <label className="text-xs font-medium">Horário Início</label>
                 <input name="start_time" type="time" value={formData.start_time} className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Horário Término</label>
-                <input name="end_time" type="time" value={formData.end_time} className="w-full p-2 rounded-//md border bg-background text-sm" onChange={handleChange} />
+                <input name="end_time" type="time" value={formData.end_time} className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} />
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-medium">Prazo (Data Esperada)</label>
-                <input name="expected_date" type="date" value={formData.expected_date} className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} required />
+                <label className="text-xs font-medium">Tipo de Vínculo</label>
+                <select name="conv_type" value={formData.conv_type} onChange={handleChange} className="w-full p-2 rounded-md border bg-background text-sm">
+                  <option value="Convênio">Convênio</option>
+                  <option value="TED">TED</option>
+                </select>
+              </div>
+              
+              <div className="space-y-2 md:col-span-2">
+                <label className="text-xs font-medium">Número do {formData.conv_type} e Ano</label>
+                <div className="flex gap-2">
+                  <input name="convenio" placeholder="Nº Convênio/TED" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenio} />
+                  <input name="conv_year" placeholder="Ano" className="w-24 p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.conv_year} />
+                </div>
               </div>
 
               {formData.produto !== "Outro" && (
-                <>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium">Tipo de Vínculo</label>
-                    <select name="conv_type" value={formData.conv_type} onChange={handleChange} className="w-full p-2 rounded-md border bg-background text-sm">
-                      <option value="Convênio">Convênio</option>
-                      <option value="TED">TED</option>
-                    </select>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium">Número do {formData.conv_type}</label>
-                    <input name="convenio" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenio} />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs font-medium">{formData.conv_type === "TED" ? "Parceiro" : "Convenente"}</label>
-                    <input name="convenente" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenente} />
-                  </div>
-                </>
+                <div className="space-y-2 md:col-span-3">
+                  <label className="text-xs font-medium">{formData.conv_type === "TED" ? "Parceiro" : "Convenente"}</label>
+                  <input name="convenente" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenente} />
+                </div>
               )}
 
               <div className="md:col-span-3 flex justify-end gap-3 mt-4">
