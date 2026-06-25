@@ -15,6 +15,11 @@ export default function Header() {
 
   if (pathname === "/") return null;
 
+  async function handleLogout() {
+    await supabase.auth.signOut();
+    window.location.href = "/";
+  }
+
   return (
     <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-darkBg text-slate-900 dark:text-white px-6 flex items-center justify-between transition-colors duration-300">
       <div className="flex items-center gap-6">
@@ -31,15 +36,18 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 ml-8">
-          <Link href="/dashboard" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
-            <Users className="w-4 h-4" /> Home
+          <Link href="/dashboard" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? 'text-white font-bold' : 'text-slate-400 hover:text-white'}`}>
+            <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
+
           <Link href="/minhas-atividades" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
-          <Link href="/home" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? 'font-bold' : 'text-slate-400 hover:text-white'}`}>
-            <LayoutDashboard className="w-4 h-4" /> Equipe
+
+          <Link href="/home" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+            <Users className="w-4 h-4" /> Equipe
           </Link>
+
           <Link href="/relatorios" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
@@ -55,7 +63,7 @@ export default function Header() {
             <User className="w-4 h-4" />
             <span className="text-sm font-medium">{user?.full_name?.split(" ")[0]}</span>
           </Link>
-          <Button variant="ghost" onClick={() => supabase.auth.signOut()} className="text-slate-400 hover:text-white p-2">
+          <Button variant="ghost" onClick={handleLogout} className="text-slate-400 hover:text-white p-2">
             <LogOut className="w-4 h-4" />
           </Button>
         </div>

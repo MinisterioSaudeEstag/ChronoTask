@@ -81,11 +81,10 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
               <th className="px-4 py-3">Demanda / Produto</th>
               <th className="px-4 py-3">Processo</th>
               <th className="px-4 py-3">Convênio</th>
-              <th className="px-4 py-3">Ano</th>
               <th className="px-4 py-3">Início / Término</th>
               <th className="px-4 py-3">Carga Horária</th>
               <th className="px-4 py-3">Status</th>
-              {isAdmin && <th className="px-4 py-3 text-center">Ações</th>}
+              <th className="px-4 py-3 text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60">
@@ -123,13 +122,17 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     {item.convenio ? `${item.convenio} ${item.conv_year ? `| ${item.conv_year}` : ""}` : "-"}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-xs">Início: {item.start_date}</p>
-                    <p className="text-xs font-semibold">Retorno: {item.expected_date}</p>
+                    <p className="text-xs">Início: {item.start_date || "-"}</p>
+                    <p className="text-xs font-semibold">Retorno: {item.expected_date || "-"}</p>
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex items-center gap-1 text-muted-//foreground">
+                    <div className="flex items-center gap-1 text-muted-foreground">
                       <Clock className="w-3 h-3" /> 
-                      <span>{item.expected_time ? `${item.expected_time}h` : "-"}</span>
+                      <span className="font-medium">
+                        {(item.expected_time !== null && item.expected_time !== undefined && item.expected_time !== "") 
+                          ? `${item.expected_time}h` 
+                          : "-"}
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -153,11 +156,14 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </select>
                     </div>
                   </td>
-                  {isAdmin && (
-                    <td className="px-4 py-3 flex justify-center gap-2">
+                  <td className="px-4 py-3 flex justify-center gap-2">
+                    {isAdmin && (
                       <Button variant="ghost" size="sm" className="h-8 px-2 cursor-pointer" onClick={() => onEdit(item)}>
                         Editar
                       </Button>
+                    )}
+                    
+                    {!isAdmin && (
                       <Button 
                         variant="ghost" 
                         size="sm" 
@@ -166,8 +172,8 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       >
                         <MessageSquare className="w-3 h-3 mr-1" /> obs
                       </Button>
-                    </td>
-                  )}
+                    )}
+                  </td>
                 </tr>
               ))
             )}
