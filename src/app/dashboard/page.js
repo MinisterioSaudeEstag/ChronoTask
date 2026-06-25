@@ -13,8 +13,7 @@ import DemandasRecentesTable from "@/components///demanda/recentDemandTable";
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-  
-  // ESTADO PARA EDIÇÃO - Essencial para o modal abrir
+
   const [taskToEdit, setTaskToEdit] = useState(null);
 
   const { data: demandas = [], isLoading } = useQuery({
@@ -38,7 +37,6 @@ export default function Dashboard() {
   if (isLoading) return <div className="max-w-7xl mx-auto px-4 py-8"><Skeleton className="h-10 w-64" /></div>;
 
   return (
-    // APLICANDO COR CREME NO MODO CLARO
     <div className="min-h-screen bg-cream dark:bg-darkBg text-slate-900 dark:text-white px-6 py-12 space-y-12 transition-colors duration-300">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="space-y-1">

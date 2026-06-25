@@ -20,6 +20,25 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
   ];
 
+  async function handleAddObservation(taskId) {
+    const observation = window.prompt("Insira a observação ou devolutiva da demanda:");
+    if (observation === null) return; 
+    if (observation.trim() === "") return;
+
+    try {
+      const { error } = await supabase
+        .from("tasks")
+        .update({ observation })
+        .eq("id", taskId);
+
+      if (error) throw error;
+      toast.success("Observação adicionada!");
+      queryClient.invalidateQueries(["demandas"]);
+    } catch (error) {
+      toast.error("Erro ao salvar observação: " + error.message);
+    }
+  }
+
   async function handleStatusChange(taskId, newStatus) {
     let observation = "";
     if (newStatus === "concluida") {

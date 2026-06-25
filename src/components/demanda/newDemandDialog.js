@@ -18,7 +18,8 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
     expected_time: "", expected_date: "", start_date: "",
     start_time: "", end_time: "", processo: "", 
     conv_type: "Convênio", 
-    convenio: "", convenente: "",
+    convenio: "", conv_year: "",
+    convenente: "",
   });
 
   useEffect(() => {
