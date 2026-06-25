@@ -27,13 +27,35 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     if (observation.trim() === "") return;
 
     try {
-      const { error } = await supabase
-        .from("tasks")
-        .update({ observation })
-        .eq("id", taskId);
-
+      const { error } = await supabase.from("tasks").update({ observation }).eq("id", taskId);
       if (error) throw error;
-      toast.success("Observação salva!");
+
+      const { data: taskData } = await supabase
+        .from("tasks")
+        .select("admin_id, descricao, expected_date, profiles:admin_id(email, full_name)")
+        .eq("id", taskId)
+        .single();
+
+      if (taskData?.profiles?.email) {
+        try {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: taskData.profiles.email,
+              adminNome: taskData.profiles.full_name,
+              funcionarioNome: user?.full_name || "Funcionário",
+              demanda: taskData.descricao,
+              prazo: taskData.expected_date,
+              tipo: 'devolutiva',
+            }),
+          });
+        } catch (emailErr) {
+          console.error("Falha no envio de e-mail:", emailErr);
+        }
+      }
+
+      toast.success("Observação salva e Admin notificado!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
       toast.error("Erro ao salvar observação: " + error.message);
@@ -93,7 +115,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   return (
     <section className="space-y-4">
-
       <div className="overflow-x-auto rounded-xl border border-border/60 bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 dark:bg-slate-800 text-muted-foreground uppercase text-[10px] font-bold">

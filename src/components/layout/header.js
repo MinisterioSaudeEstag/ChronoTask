@@ -36,7 +36,7 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 ml-8">
-          <Link href="/dashboard" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? 'text-white font-bold' : 'text-slate-400 hover:text-white'}`}>
+          <Link href="/dashboard" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? '' : 'text-slate-400 hover:text-white transition-colors'}`}>
             <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
 
@@ -55,9 +55,9 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-colors">
+        {/* <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-colors">
           {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-        </button>
+        </button> */}
         <div className="flex items-center gap-3 pl-4 border-l border-white/10">
           <Link href="/profile" className="flex items-center gap-2 hover:text-white transition-colors">
             <User className="w-4 h-4" />

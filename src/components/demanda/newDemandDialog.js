@@ -75,9 +75,30 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
       } else {
         const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "em_andamento" }]);
         if (error) throw error;
+
+        try {
+          const { data: empData } = await supabase.from('profiles').select('email').eq('id', formData.funcionario_id).single();
+          
+          if (empData?.email) {
+            await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: empData.email,
+                funcionarioNome: formData.funcionario_nome,
+                adminNome: user.user_metadata?.full_name || "Administração DITRE",
+                demanda: formData.descricao,
+                prazo: formData.expected_date,
+                tipo: 'atribuicao', 
+              }),
+            });
+          }
+        } catch (emailError) {
+          console.error("Falha ao disparar e-mail de atribuição:", emailError);
+        }
       }
 
-      toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída!");
+      toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída e notificação enviada!");
       setIsOpen(false);
       if (setTaskToEdit) setTaskToEdit(null); 
       queryClient.invalidateQueries(["demandas"]);
