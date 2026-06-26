@@ -55,29 +55,52 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
     setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
+
       const finalData = { ...formData };
 
-      if (finalData.expected_time === "") {
+      if (finalData.expected_time === "" || finalData.expected_time === null || isNaN(finalData.expected_time)) {
         finalData.expected_time = null;
       } else {
-        finalData.expected_time = parseFloat(finalData.expected_time);
+        finalData.expected_time = Number(finalData.expected_time);
+      }
+
+      finalData.expected_date = finalData.expected_date || null;
+      finalData.start_date = finalData.start_date || null;
+
+      finalData.start_time = finalData.start_time || null;
+      finalData.end_time = finalData.end_time || null;
+
+      if (!finalData.processo || finalData.processo === "0000000" || finalData.processo.length < 4) {
+        finalData.processo = null;
       }
 
       if (finalData.produto === "Outro") {
-        finalData.convenio = "";
-        finalData.conv_year = "";
-        finalData.convenente = "";
+        finalData.convenio = null;
+        finalData.conv_year = null;
+        finalData.convenente = null;
+      } else {
+        finalData.convenio = finalData.convenio || null;
+        finalData.conv_year = finalData.conv_year || null;
+        finalData.convenente = finalData.convenente || null;
       }
 
       if (taskToEdit) {
         const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("tasks").insert([{ ...finalData, admin_id: user.id, status: "em_andamento" }]);
+        const { error } = await supabase.from("tasks").insert([{ 
+          ...finalData, 
+          admin_id: user.id, 
+          status: "em_andamento" 
+        }]);
         if (error) throw error;
 
         try {
-          const { data: empData } = await supabase.from('profiles').select('email').eq('id', formData.funcionario_id).single();
+          const { data: empData } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', formData.funcionario_id)
+            .single();
           
           if (empData?.email) {
             await fetch('/api/send-email', {
@@ -94,7 +117,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
             });
           }
         } catch (emailError) {
-          console.error("Falha ao disparar e-mail de atribuição:", emailError);
+          console.error("Falha ao disparar e-mail:", emailError);
         }
       }
 
@@ -134,7 +157,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Número do Processo (Opcional)</label>
-                <input name="processo" placeholder="0000.000/0000-00" className="w-24 p-2 rounded-md border bg-background text-sm" onChange={handleChange}/>
+                <input name="processo" placeholder="0000.000/0000-00" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange}/>
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Tipo de Produto</label>
