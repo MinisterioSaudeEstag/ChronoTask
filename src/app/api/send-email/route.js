@@ -83,7 +83,7 @@ export async function POST(req) {
     `;
 
     const { data, error } = await resend.emails.send({
-      from: 'ChronoTask <onboarding@resend.dev>', 
+      from: 'ChronoTask <arthur.moreira@saude.gov.br>', 
       to: [email],
       subject: subject,
       html: htmlContent,
