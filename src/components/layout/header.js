@@ -7,11 +7,12 @@ import { useDarkMode } from "@/hooks/useDarkMode";
 import { supabase } from "@/lib/supabaseClient";
 import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import NotificationBell from "@/components/notifications/notificationBell";
 
 export default function Header() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const { isDark, toggleTheme } = useDarkMode();
+  // const { isDark, toggleTheme } = useDarkMode();
 
   if (pathname === "/") return null;
 
@@ -36,34 +37,65 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 ml-8">
-          <Link href="/dashboard" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard' ? '' : 'text-slate-400 hover:text-white transition-colors'}`}>
+          <Link 
+            href="/dashboard" 
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/dashboard' 
+                ? 'text-primary font-bold' 
+                : 'text-slate-400 hover:text-foreground'
+            }`}
+          >
             <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
 
-          <Link href="/minhas-atividades" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+          <Link 
+            href="/minhas-atividades" 
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/minhas-atividades' 
+                ? 'text-primary font-bold' 
+                : 'text-slate-400 hover:text-foreground'
+            }`}
+          >
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
 
-          <Link href="/home" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+          <Link 
+            href="/home" 
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/home' 
+                ? 'text-primary font-bold' 
+                : 'text-slate-400 hover:text-foreground'
+            }`}
+          >
             <Users className="w-4 h-4" /> Equipe
           </Link>
 
-          <Link href="/relatorios" className="flex items-center gap-2 text-sm text-slate-400 hover:text-white transition-colors">
+          <Link 
+            href="/relatorios" 
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/relatorios' 
+                ? 'text-primary font-bold' 
+                : 'text-slate-400 hover:text-foreground'
+            }`}
+          >
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
         </nav>
       </div>
-
+      
       <div className="flex items-center gap-4">
         {/* <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-colors">
           {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
         </button> */}
+
+        <NotificationBell />
+
         <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-          <Link href="/profile" className="flex items-center gap-2 hover:text-white transition-colors">
+          <Link href="/profile" className="flex items-center gap-2 hover:text-primary transition-colors">
             <User className="w-4 h-4" />
             <span className="text-sm font-medium">{user?.full_name?.split(" ")[0]}</span>
           </Link>
-          <Button variant="ghost" onClick={handleLogout} className="text-slate-400 hover:text-white p-2">
+          <Button variant="ghost" onClick={handleLogout} className="text-slate-400 hover:text-red-500 p-2 transition-colors">
             <LogOut className="w-4 h-4" />
           </Button>
         </div>
