@@ -27,7 +27,7 @@ export default function Header() {
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="flex items-center gap-2">
             <img src="/logo-sus.png" alt="SUS" className="h-8 w-auto" />
-            <img src="/logo-ms.png" alt="MS" className="h-8 w-auto" />
+            <img src="/logo-ms.jpeg" alt="MS" className="h-8 w-auto" />
           </div>
           <div className="h-8 w-[1px] bg-white/10 mx-2" />
           <div className="flex flex-col">
