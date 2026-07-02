@@ -8,7 +8,6 @@ export default function Footer() {
         <div className="flex flex-col items-center md:items-start gap-3">
           <div className="flex items-center gap-3 opacity-80">
             <img src="/logo-sus.png" alt="SUS" className="h-6 w-auto" />
-            <img src="/logo-ms.png" alt="MS" className="h-6 w-auto" />
             <span className="text-xs font-bold uppercase text-slate-400 ml-2">Ministério da Saúde</span>
           </div>
           <p className="text-[10px] text-slate-500">
@@ -18,9 +17,9 @@ export default function Footer() {
 
         <div className="flex items-center gap-6 text-xs text-slate-400">
           <Link href="/privacidade" className="hover:text-white transition-colors">Termos de Privacidade</Link>
-          <Link href="#" className="hover:text-white transition-colors">Suporte Técnico</Link>
+          <Link className="hover:text-white transition-colors">Suporte Técnico | Entre em contato | Arthur.moreira@saude.gov.br</Link>
           <Link href="https://www.gov.br" target="_blank" className="hover:text-white transition-colors">
-            <img src="/logo-govbr.png" alt="gov.br" className="h-5 w-auto" />
+            <img src="/logo-ms.jpeg" alt="gov.br" className="h-5 w-auto" />
           </Link>
         </div>
       </div>
