@@ -4,8 +4,6 @@ import { Circle } from "lucide-react";
 
 export default function FuncionarioCard({ nome, demandas }) {
   const total = demandas.length;
-  
-  // Soma os status 'pendente' e 'nao_iniciado' para gerar o badge
   const pendentes = demandas.filter(d => d.status === "pendente").length;
   const naoIniciadas = demandas.filter(d => d.status === "nao_iniciado").length;
   const totalPendentes = pendentes + naoIniciadas;
@@ -26,7 +24,7 @@ export default function FuncionarioCard({ nome, demandas }) {
           {totalPendentes > 0 && (
             <span className="flex items-center gap-1 px-2 py-1 rounded-full bg-amber-100 text-amber-700 text-[10px] font-medium">
               <Circle className="w-2 h-2 fill-current" /> 
-              {totalPendentes === 1 ? "1 pendente" : `${totalPendentes} pendentes`}
+              {totalPendentes} {totalPendentes === 1 ? "pendente" : "pendentes"}
             </span>
           )}
         </div>

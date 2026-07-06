@@ -66,23 +66,26 @@ export default function HomeEquipe() {
       </div>
 
       {selectedEmployee && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
-          <div className="bg-white dark:bg-slate-900 w-full max-w-6xl rounded-xl shadow-2xl overflow-hidden">
-            <div className="px-6 py-4 border-b border-border/60 flex justify-between items-center bg-primary text-white">
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+          <div className="relative bg-white dark:bg-slate-900 w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl overflow-hidden flex flex-col">
+
+            <div className="px-6 py-4 border-b border-border/60 flex justify-between items-center bg-primary text-white shrink-0">
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5" />
                 <h3 className="font-bold text-lg">Atividades de {selectedEmployee.full_name}</h3>
               </div>
+
               <button 
                 onClick={() => setSelectedEmployee(null)} 
-                className="hover:bg-white/20 p-2 rounded-full transition-colors flex items-center justify-center"
+                className="z-50 bg-white text-primary hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center"
                 aria-label="Fechar modal"
+                type="button"
               >
-                <X className="w-5 h-5" />
+                <X className="w-5 h-5 font-bold" strokeWidth={3} />
               </button>
             </div>
 
-            <div className="p-6 overflow-x-auto">
+            <div className="p-6 overflow-y-auto flex-1">
               {loadingTasks ? (
                 <div className="flex justify-center py-10 text-slate-500">Buscando atividades...</div>
               ) : tasks.length === 0 ? (
