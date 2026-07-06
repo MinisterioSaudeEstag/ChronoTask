@@ -98,7 +98,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
         const { error } = await supabase.from("tasks").insert([{
           ...finalData,
           admin_id: user.id,
-          status: "em_andamento"
+          status: "nao_iniciado"
         }]);
 
         if (error) throw error;
