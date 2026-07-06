@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, User, ExternalLink, Hourglass } from "lucide-react";
+import { Users, User, ExternalLink, Hourglass, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 
@@ -73,7 +73,13 @@ export default function HomeEquipe() {
                 <User className="w-5 h-5" />
                 <h3 className="font-bold text-lg">Atividades de {selectedEmployee.full_name}</h3>
               </div>
-              <button onClick={() => setSelectedEmployee(null)} className="hover:text-slate-200 transition-colors text-sm text-black">Fechar</button>
+              <button 
+                onClick={() => setSelectedEmployee(null)} 
+                className="hover:bg-white/20 p-2 rounded-full transition-colors flex items-center justify-center"
+                aria-label="Fechar modal"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             <div className="p-6 overflow-x-auto">
@@ -82,99 +88,80 @@ export default function HomeEquipe() {
               ) : tasks.length === 0 ? (
                 <div className="text-center py-10 text-slate-500">Nenhuma atividade atribuída a este funcionário.</div>
               ) : (
-                <div className="p-6 overflow-x-auto">
-                  {loadingTasks ? (
-                    <div className="flex justify-center py-10 text-slate-500">Buscando atividades...</div>
-                  ) : tasks.length === 0 ? (
-                    <div className="text-center py-10 text-slate-500">Nenhuma atividade atribuída a este funcionário.</div>
-                  ) : (
-                    <table className="w-full text-sm text-left">
-                      <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase text-[11px] font-bold">
-                        <tr>
-                          <th className="px-4 py-4">Atividade / Produto</th>
-                          <th className="px-4 py-4">Atribuído por</th>
-                          {/* COLUNA AMPLIADA: Ocupa mais espaço e comporta data + hora */}
-                          <th className="px-4 py-4 min-w-[220px]">Prazo / Hora</th>
-                          <th className="px-4 py-4">Processo</th>
-                          <th className="px-4 py-4">Convênio / TED</th>
-                          <th className="px-4 py-4">Status</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border/60">
-                        {tasks.map(task => (
-                          <tr key={task.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
-                            <td className="px-4 py-4 align-top">
-                              <p className="font-semibold text-slate-900 dark:text-white text-sm">{task.descricao}</p>
-                              <p className="text-xs text-slate-500 mt-1">{task.produto}</p>
-                            </td>
-                            <td className="px-4 py-4 align-top text-sm text-slate-600 dark:text-slate-300">
-                              {task.profiles?.full_name || "Admin"}
-                            </td>
-                            <td className="px-4 py-4 align-top">
-                              {task.due_datetime ? (
-                                <div className="space-y-2">
-                                  {/* DATA DE ATRIBUIÇÃO (Criação) */}
-                                  <p className="text-[11px] text-slate-500 uppercase font-semibold tracking-wider">
-                                    Atribuído em:
-                                  </p>
-                                  <p className="text-sm font-medium text-slate-900 dark:text-white">
-                                    {new Date(task.created_at).toLocaleDateString('pt-BR')}
-                                  </p>
-
-                                  {/* PRAZO FINAL (Finalização) */}
-                                  <p className="text-[11px] text-amber-600 dark:text-amber-400 uppercase font-bold tracking-wider mt-2">
-                                    Prazo Final:
-                                  </p>
-                                  <p className="text-base font-bold text-amber-700 dark:text-amber-300">
-                                    {new Date(task.due_datetime).toLocaleDateString('pt-BR')}
-                                  </p>
-                                  <p className="text-xs text-slate-500">
-                                    {task.start_time || '--:--'} às {task.end_time || '--:--'}
-                                  </p>
-                                </div>
-                              ) : (
-                                <span className="text-amber-600 text-sm font-medium">A definir</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-4 align-top">
-                              {task.processo ? (
-                                <button
-                                  onClick={() => { navigator.clipboard.writeText(task.processo); toast.success("Copiado!"); }}
-                                  className="text-primary flex items-center gap-1 hover:underline font-medium text-sm"
-                                >
-                                  {task.processo} <ExternalLink className="w-3 h-3" />
-                                </button>
-                              ) : (
-                                <span className="text-slate-400 italic text-xs">Não informado</span>
-                              )}
-                            </td>
-                            <td className="px-4 py-4 align-top text-sm">
-                              <p className="font-medium text-slate-900 dark:text-white">
-                                {task.conv_type || "Convênio"}: {task.convenio ? `${task.convenio} ${task.conv_year ? `| ${task.conv_year}` : ""}` : "-"}
+                <table className="w-full text-sm text-left">
+                  <thead className="bg-slate-50 dark:bg-slate-800 text-slate-500 uppercase text-[11px] font-bold">
+                    <tr>
+                      <th className="px-4 py-4">Atividade / Produto</th>
+                      <th className="px-4 py-4">Atribuído por</th>
+                      <th className="px-4 py-4 min-w-[220px]">Prazo / Hora</th>
+                      <th className="px-4 py-4">Processo</th>
+                      <th className="px-4 py-4">Convênio / TED</th>
+                      <th className="px-4 py-4">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-border/60">
+                    {tasks.map(task => (
+                      <tr key={task.id} className="hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors">
+                        <td className="px-4 py-4 align-top">
+                          <p className="font-semibold text-slate-900 dark:text-white text-sm">{task.descricao}</p>
+                          <p className="text-xs text-slate-500 mt-1">{task.produto}</p>
+                        </td>
+                        <td className="px-4 py-4 align-top text-sm text-slate-600 dark:text-slate-300">
+                          {task.profiles?.full_name || "Admin"}
+                        </td>
+                        <td className="px-4 py-4 align-top">
+                          {task.due_datetime ? (
+                            <div className="space-y-2">
+                              <p className="text-[11px] text-slate-500 uppercase font-semibold tracking-wider">Atribuído em:</p>
+                              <p className="text-sm font-medium text-slate-900 dark:text-white">
+                                {new Date(task.created_at).toLocaleDateString('pt-BR')}
                               </p>
-                              {task.convenente && (
-                                <p className="text-[11px] text-slate-500 mt-1 uppercase tracking-wider">
-                                  {task.conv_type === "TED" ? "Parceiro" : "Convenente"}:
-                                  <span className="text-slate-700 dark:text-slate-300 font-medium ml-1 normal-case">
-                                    {task.convenente}
-                                  </span>
-                                </p>
-                              )}
-                            </td>
-                            <td className="px-4 py-4 align-top">
-                              <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${task.status === 'concluida' ? 'bg-emerald-100 text-emerald-700' :
-                                  task.status === 'em_andamento' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
-                                }`}>
-                                {task.status.replace('_', ' ')}
+                              <p className="text-[11px] text-amber-600 dark:text-amber-400 uppercase font-bold tracking-wider mt-2">Prazo Final:</p>
+                              <p className="text-base font-bold text-amber-700 dark:text-amber-300">
+                                {new Date(task.due_datetime).toLocaleDateString('pt-BR')}
+                              </p>
+                              <p className="text-xs text-slate-500">
+                                {task.start_time || '--:--'} às {task.end_time || '--:--'}
+                              </p>
+                            </div>
+                          ) : (
+                            <span className="text-amber-600 text-sm font-medium">A definir</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 align-top">
+                          {task.processo ? (
+                            <button onClick={() => { navigator.clipboard.writeText(task.processo); toast.success("Copiado!"); }} className="text-primary flex items-center gap-1 hover:underline font-medium text-sm">
+                              {task.processo} <ExternalLink className="w-3 h-3" />
+                            </button>
+                          ) : (
+                            <span className="text-slate-400 italic text-xs">Não informado</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 align-top text-sm">
+                          <p className="font-medium text-slate-900 dark:text-white">
+                            {task.conv_type || "Convênio"}: {task.convenio ? `${task.convenio} ${task.conv_year ? `| ${task.conv_year}` : ""}` : "-"}
+                          </p>
+                          {task.convenente && (
+                            <p className="text-[11px] text-slate-500 mt-1 uppercase tracking-wider">
+                              {task.conv_type === "TED" ? "Parceiro" : "Convenente"}:
+                              <span className="text-slate-700 dark:text-slate-300 font-medium ml-1 normal-case">
+                                {task.convenente}
                               </span>
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  )}
-                </div>
-
+                            </p>
+                          )}
+                        </td>
+                        <td className="px-4 py-4 align-top">
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
+                            task.status === 'concluida' ? 'bg-emerald-100 text-emerald-700' :
+                            task.status === 'em_andamento' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {task.status.replace('_', ' ')}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
               )}
             </div>
           </div>
