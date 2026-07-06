@@ -72,12 +72,12 @@ export default function HomeEquipe() {
             <div className="px-6 py-4 border-b border-border/60 flex justify-between items-center bg-primary text-white shrink-0">
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5" />
-                <h3 className="font-bold text-lg">Atividades de {selectedEmployee.full_name}</h3>
+                <h3 className="font-bold text-lg text-black">Atividades de {selectedEmployee.full_name}</h3>
               </div>
 
               <button 
                 onClick={() => setSelectedEmployee(null)} 
-                className="z-50 bg-white text-primary hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center"
+                className="z-50 text-primary hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center text-black bg-red-400 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
                 aria-label="Fechar modal"
                 type="button"
               >
