@@ -18,9 +18,6 @@ export default function Footer() {
         <div className="flex items-center gap-6 text-xs text-slate-400">
           <Link href="/privacidade" className="hover:text-white transition-colors">Termos de Privacidade</Link>
           <Link href="#" className="hover:text-white transition-colors">Suporte Técnico | Entre em contato | Arthur.moreira@saude.gov.br</Link>
-          <Link href="https://www.gov.br" target="_blank" className="hover:text-white transition-colors">
-            <img src="/logo-ms.jpeg" alt="gov.br" className="h-5 w-auto" />
-          </Link>
         </div>
       </div>
     </footer>

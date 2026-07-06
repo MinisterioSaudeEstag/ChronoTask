@@ -16,8 +16,8 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
   const [formData, setFormData] = useState({
     funcionario_id: "", funcionario_nome: "", descricao: "", produto: "Planilha",
     expected_time: "", expected_date: "", start_date: "",
-    start_time: "", end_time: "", processo: "", 
-    conv_type: "Convênio", 
+    start_time: "", end_time: "", processo: "",
+    conv_type: "Convênio",
     convenio: "", conv_year: "",
     convenente: "",
   });
@@ -50,88 +50,94 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
     setFormData(prev => ({ ...prev, funcionario_id: id, funcionario_nome: func?.full_name || "" }));
   };
 
-  async function handleSave(e) {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
+ async function handleSave(e) {
+  e.preventDefault();
+  setLoading(true);
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    const finalData = { ...formData };
 
-      const finalData = { ...formData };
-
-      if (finalData.expected_time === "" || finalData.expected_time === null || isNaN(finalData.expected_time)) {
-        finalData.expected_time = null;
-      } else {
-        finalData.expected_time = Number(finalData.expected_time);
-      }
-
-      finalData.expected_date = finalData.expected_date || null;
-      finalData.start_date = finalData.start_date || null;
-
-      finalData.start_time = finalData.start_time || null;
-      finalData.end_time = finalData.end_time || null;
-
-      if (!finalData.processo || finalData.processo === "0000000" || finalData.processo.length < 4) {
-        finalData.processo = null;
-      }
-
-      if (finalData.produto === "Outro") {
-        finalData.convenio = null;
-        finalData.conv_year = null;
-        finalData.convenente = null;
-      } else {
-        finalData.convenio = finalData.convenio || null;
-        finalData.conv_year = finalData.conv_year || null;
-        finalData.convenente = finalData.convenente || null;
-      }
-
-      if (taskToEdit) {
-        const { error } = await supabase.from("tasks").update(finalData).eq("id", taskToEdit.id);
-        if (error) throw error;
-      } else {
-        const { error } = await supabase.from("tasks").insert([{ 
-          ...finalData, 
-          admin_id: user.id, 
-          status: "em_andamento" 
-        }]);
-        if (error) throw error;
-
-        try {
-          const { data: empData } = await supabase
-            .from('profiles')
-            .select('email')
-            .eq('id', formData.funcionario_id)
-            .single();
-          
-          if (empData?.email) {
-            await fetch('/api/send-email', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({
-                email: empData.email,
-                funcionarioNome: formData.funcionario_nome,
-                adminNome: user.user_metadata?.full_name || "Administração DITRE",
-                demanda: formData.descricao,
-                prazo: formData.expected_date,
-                tipo: 'atribuicao', 
-              }),
-            });
-          }
-        } catch (emailError) {
-          console.error("Falha ao disparar e-mail:", emailError);
-        }
-      }
-
-      toast.success(taskToEdit ? "Demanda atualizada!" : "Demanda atribuída e notificação enviada!");
-      setIsOpen(false);
-      if (setTaskToEdit) setTaskToEdit(null); 
-      queryClient.invalidateQueries(["demandas"]);
-      queryClient.invalidateQueries(["equipe"]);
-    } catch (error) {
-      toast.error("Erro: " + error.message);
-    } finally {
-      setLoading(false);
+    if (finalData.expected_time === "" || finalData.expected_time === null) {
+      finalData.expected_time = null;
+    } else {
+      const parsed = Number(finalData.expected_time);
+      finalData.expected_time = isNaN(parsed) ? null : parsed;
     }
+
+    if (finalData.expected_date) {
+      const timePart = finalData.end_time || "23:59:00";
+      finalData.due_datetime = `${finalData.expected_date}T${timePart}`;
+    } else {
+      finalData.due_datetime = null;
+    }
+
+    if (!finalData.processo || finalData.processo === "0000000" || finalData.processo.length < 4) {
+      finalData.processo = null;
+    }
+
+    finalData.expected_date = finalData.expected_date || null;
+    finalData.start_date = finalData.start_date || null;
+    finalData.start_time = finalData.start_time || null;
+    finalData.end_time = finalData.end_time || null;
+    finalData.convenio = finalData.convenio || null;
+    finalData.conv_year = finalData.conv_year || null;
+    finalData.convenente = finalData.convenente || null;
+
+    if (taskToEdit) {
+      const { error } = await supabase
+        .from("tasks")
+        .update(finalData)
+        .eq("id", taskToEdit.id);
+      
+      if (error) throw error;
+      toast.success("Demanda atualizada com sucesso!");
+    } else {
+      const { error } = await supabase.from("tasks").insert([{ 
+        ...finalData, 
+        admin_id: user.id, 
+        status: "em_andamento" 
+      }]);
+      
+      if (error) throw error;
+      toast.success("Demanda atribuída!");
+
+      try {
+        const { data: empData } = await supabase
+          .from('profiles')
+          .select('email')
+          .eq('id', formData.funcionario_id)
+          .single();
+        
+        if (empData?.email) {
+          await fetch('/api/send-email', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              email: empData.email,
+              funcionarioNome: formData.funcionario_nome,
+              adminNome: user.user_metadata?.full_name || "Administração DITRE",
+              demanda: formData.descricao,
+              prazo: formData.expected_date,
+              tipo: 'atribuicao', 
+            }),
+          });
+        }
+      } catch (emailError) {
+        console.error("Falha no e-mail:", emailError);
+      }
+    }
+
+    setIsOpen(false);
+    if (setTaskToEdit) setTaskToEdit(null); 
+    queryClient.invalidateQueries(["demandas"]);
+    queryClient.invalidateQueries(["equipe"]);
+  } catch (error) {
+    toast.error("Erro ao salvar: " + error.message);
+  } finally {
+    setLoading(false);
   }
+}
 
   return (
     <>
@@ -157,7 +163,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Número do Processo (Opcional)</label>
-                <input name="processo" placeholder="0000.000/0000-00" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange}/>
+                <input name="processo" placeholder="0000.000/0000-00" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} />
               </div>
               <div className="space-y-2">
                 <label className="text-xs font-medium">Tipo de Produto</label>
@@ -180,13 +186,13 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
 
               <div className="space-y-2">
                 <label className="text-xs font-medium">Carga Horária (Estimada)</label>
-                <input 
-                  name="expected_time" 
-                  type="number" 
-                  placeholder="Ex: 2" 
-                  value={formData.expected_time} 
-                  className="w-full p-2 rounded-md border bg-background text-sm" 
-                  onChange={handleChange} 
+                <input
+                  name="expected_time"
+                  type="number"
+                  placeholder="Ex: 2"
+                  value={formData.expected_time}
+                  className="w-full p-2 rounded-md border bg-background text-sm"
+                  onChange={handleChange}
                 />
               </div>
 
@@ -215,7 +221,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
                   <option value="TED">TED</option>
                 </select>
               </div>
-              
+
               <div className="space-y-2 md:col-span-2">
                 <label className="text-xs font-medium">Número do {formData.conv_type}</label>
                 <div className="flex gap-2">
