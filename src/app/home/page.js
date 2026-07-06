@@ -73,7 +73,7 @@ export default function HomeEquipe() {
                 <User className="w-5 h-5" />
                 <h3 className="font-bold text-lg">Atividades de {selectedEmployee.full_name}</h3>
               </div>
-              <button onClick={() => setSelectedEmployee(null)} className="hover:text-slate-200 transition-colors text-sm">Fechar</button>
+              <button onClick={() => setSelectedEmployee(null)} className="hover:text-slate-200 transition-colors text-sm text-black">Fechar</button>
             </div>
 
             <div className="p-6 overflow-x-auto">
