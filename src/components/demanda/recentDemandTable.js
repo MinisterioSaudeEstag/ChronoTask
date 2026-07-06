@@ -15,6 +15,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const [deletingId, setDeletingId] = useState(null);
 
   const STATUS_OPTIONS = [
+    { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
     { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
     { value: "em_andamento", label: "Em Andamento", color: "bg-blue-100 text-blue-700" },
     { value: "concluida", label: "Concluída", color: "bg-emerald-100 text-emerald-700" },
@@ -29,33 +30,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     try {
       const { error } = await supabase.from("tasks").update({ observation }).eq("id", taskId);
       if (error) throw error;
-
-      const { data: taskData } = await supabase
-        .from("tasks")
-        .select("admin_id, descricao, expected_date, profiles:admin_id(email, full_name)")
-        .eq("id", taskId)
-        .single();
-
-      if (taskData?.profiles?.email) {
-        try {
-          await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: taskData.profiles.email,
-              adminNome: taskData.profiles.full_name,
-              funcionarioNome: user?.full_name || "Funcionário",
-              demanda: taskData.descricao,
-              prazo: taskData.expected_date,
-              tipo: 'devolutiva',
-            }),
-          });
-        } catch (emailErr) {
-          console.error("Falha no envio de e-mail:", emailErr);
-        }
-      }
-
-      toast.success("Observação salva e Admin notificado!");
+      toast.success("Observação salva!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
       toast.error("Erro ao salvar observação: " + error.message);
@@ -162,9 +137,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </button>
                     ) : (
                       <span className="inline-flex items-center gap-1 text-slate-400 text-xs italic">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                          <line x1="5" y1="12" x2="19" y2="12"></line>
-                        </svg>
                         Não informado
                       </span>
                     )}

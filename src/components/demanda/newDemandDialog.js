@@ -50,94 +50,96 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
     setFormData(prev => ({ ...prev, funcionario_id: id, funcionario_nome: func?.full_name || "" }));
   };
 
- async function handleSave(e) {
-  e.preventDefault();
-  setLoading(true);
-  try {
-    const { data: { user } } = await supabase.auth.getUser();
-    
-    const finalData = { ...formData };
+  async function handleSave(e) {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
 
-    if (finalData.expected_time === "" || finalData.expected_time === null) {
-      finalData.expected_time = null;
-    } else {
-      const parsed = Number(finalData.expected_time);
-      finalData.expected_time = isNaN(parsed) ? null : parsed;
-    }
+      const finalData = { ...formData };
 
-    if (finalData.expected_date) {
-      const timePart = finalData.end_time || "23:59:00";
-      finalData.due_datetime = `${finalData.expected_date}T${timePart}`;
-    } else {
-      finalData.due_datetime = null;
-    }
-
-    if (!finalData.processo || finalData.processo === "0000000" || finalData.processo.length < 4) {
-      finalData.processo = null;
-    }
-
-    finalData.expected_date = finalData.expected_date || null;
-    finalData.start_date = finalData.start_date || null;
-    finalData.start_time = finalData.start_time || null;
-    finalData.end_time = finalData.end_time || null;
-    finalData.convenio = finalData.convenio || null;
-    finalData.conv_year = finalData.conv_year || null;
-    finalData.convenente = finalData.convenente || null;
-
-    if (taskToEdit) {
-      const { error } = await supabase
-        .from("tasks")
-        .update(finalData)
-        .eq("id", taskToEdit.id);
-      
-      if (error) throw error;
-      toast.success("Demanda atualizada com sucesso!");
-    } else {
-      const { error } = await supabase.from("tasks").insert([{ 
-        ...finalData, 
-        admin_id: user.id, 
-        status: "em_andamento" 
-      }]);
-      
-      if (error) throw error;
-      toast.success("Demanda atribuída!");
-
-      try {
-        const { data: empData } = await supabase
-          .from('profiles')
-          .select('email')
-          .eq('id', formData.funcionario_id)
-          .single();
-        
-        if (empData?.email) {
-          await fetch('/api/send-email', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: empData.email,
-              funcionarioNome: formData.funcionario_nome,
-              adminNome: user.user_metadata?.full_name || "Administração DITRE",
-              demanda: formData.descricao,
-              prazo: formData.expected_date,
-              tipo: 'atribuicao', 
-            }),
-          });
-        }
-      } catch (emailError) {
-        console.error("Falha no e-mail:", emailError);
+      if (finalData.expected_time === "" || finalData.expected_time === null) {
+        finalData.expected_time = null;
+      } else {
+        const parsed = Number(finalData.expected_time);
+        finalData.expected_time = isNaN(parsed) ? null : parsed;
       }
-    }
 
-    setIsOpen(false);
-    if (setTaskToEdit) setTaskToEdit(null); 
-    queryClient.invalidateQueries(["demandas"]);
-    queryClient.invalidateQueries(["equipe"]);
-  } catch (error) {
-    toast.error("Erro ao salvar: " + error.message);
-  } finally {
-    setLoading(false);
+      if (finalData.expected_date) {
+        const timePart = finalData.end_time && finalData.end_time.length === 5
+          ? finalData.end_time + ":00"
+          : "23:59:00";
+        finalData.due_datetime = `${finalData.expected_date}T${timePart}`;
+      } else {
+        finalData.due_datetime = null;
+      }
+
+      if (!finalData.processo || finalData.processo === "0000000" || finalData.processo.length < 4) {
+        finalData.processo = null;
+      }
+
+      finalData.expected_date = finalData.expected_date || null;
+      finalData.start_date = finalData.start_date || null;
+      finalData.start_time = finalData.start_time || null;
+      finalData.end_time = finalData.end_time || null;
+      finalData.convenio = finalData.convenio || null;
+      finalData.conv_year = finalData.conv_year || null;
+      finalData.convenente = finalData.convenente || null;
+
+      if (taskToEdit) {
+        const { error } = await supabase
+          .from("tasks")
+          .update(finalData)
+          .eq("id", taskToEdit.id);
+
+        if (error) throw error;
+        toast.success("Demanda atualizada com sucesso!");
+      } else {
+        const { error } = await supabase.from("tasks").insert([{
+          ...finalData,
+          admin_id: user.id,
+          status: "em_andamento"
+        }]);
+
+        if (error) throw error;
+        toast.success("Demanda atribuída!");
+
+        try {
+          const { data: empData } = await supabase
+            .from('profiles')
+            .select('email')
+            .eq('id', formData.funcionario_id)
+            .single();
+
+          if (empData?.email) {
+            await fetch('/api/send-email', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: empData.email,
+                funcionarioNome: formData.funcionario_nome,
+                adminNome: user.user_metadata?.full_name || "Administração DITRE",
+                demanda: formData.descricao,
+                prazo: formData.expected_date,
+                tipo: 'atribuicao',
+              }),
+            });
+          }
+        } catch (emailError) {
+          console.error("Falha no e-mail:", emailError);
+        }
+      }
+
+      setIsOpen(false);
+      if (setTaskToEdit) setTaskToEdit(null);
+      queryClient.invalidateQueries(["demandas"]);
+      queryClient.invalidateQueries(["equipe"]);
+    } catch (error) {
+      toast.error("Erro ao salvar: " + error.message);
+    } finally {
+      setLoading(false);
+    }
   }
-}
 
   return (
     <>

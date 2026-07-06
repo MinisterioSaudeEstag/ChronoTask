@@ -13,38 +13,45 @@ import DemandasRecentesTable from "@/components/demanda/recentDemandTable";
 export default function Dashboard() {
   const { user } = useAuth();
   const isAdmin = user?.role === "admin";
-
   const [taskToEdit, setTaskToEdit] = useState(null);
+
+  const { data: equipe = [], isLoading: loadingEquipe } = useQuery({
+    queryKey: ["equipe_dashboard"],
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .neq("role", "admin");
+      return data || [];
+    },
+  });
 
   const { data: demandas = [], isLoading: loadingDemandas } = useQuery({
     queryKey: ["demandas"],
     queryFn: async () => {
-      const { data, error } = await supabase
+      const { data } = await supabase
         .from("tasks")
         .select("*")
         .order("created_at", { ascending: false });
-      
-      if (error) {
-        console.error("Erro ao buscar demandas:", error);
-        return [];
-      }
-      return data;
+      return data || [];
     },
   });
+
+  const isLoading = loadingDemandas || loadingEquipe;
 
   const myDemandas = !isAdmin
     ? demandas.filter(d => d.funcionario_id === user?.id)
     : demandas;
 
   const stats = [
-    { label: "Total", value: myDemandas.length, icon: ClipboardList, color: "text-statusBlue" },
+    { label: "Não Iniciadas", value: myDemandas.filter(d => d.status === "nao_iniciado").length, icon: Clock, color: "text-slate-500" },
     { label: "Pendentes", value: myDemandas.filter(d => d.status === "pendente").length, icon: Clock, color: "text-statusYellow" },
     { label: "Em Andamento", value: myDemandas.filter(d => d.status === "em_andamento").length, icon: Clock, color: "text-statusCyan" },
     { label: "Concluídas", value: myDemandas.filter(d => d.status === "concluida").length, icon: CheckCircle2, color: "text-statusGreen" },
     { label: "Atrasadas", value: myDemandas.filter(d => d.status === "atrasada").length, icon: AlertTriangle, color: "text-statusRed" },
   ];
 
-  if (loadingDemandas) {
+  if (isLoading) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <Skeleton className="h-10 w-64" />
@@ -98,13 +105,16 @@ export default function Dashboard() {
             <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Equipe</h2>
           </div>
           <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {FUNCIONARIOS_EQUIPE.map(nome => (
-              <FuncionarioCard
-                key={nome}
-                nome={nome}
-                demandas={demandas.filter(d => d.funcionario_nome === nome)}
-              />
-            ))}
+            {equipe.map(func => {
+              const tarefasDoFunc = demandas.filter(d => d.funcionario_id === func.id);
+              return (
+                <FuncionarioCard
+                  key={func.id}
+                  nome={func.full_name}
+                  demandas={tarefasDoFunc}
+                />
+              );
+            })}
           </div>
         </section>
       )}
@@ -119,13 +129,3 @@ export default function Dashboard() {
     </div>
   );
 }
-
-const FUNCIONARIOS_EQUIPE = [
-  "Arthur Vinícius",
-  "Matheus Nascimento",
-  "Ana Aparecida",
-  "Giselly Soares",
-  "Emilly Alves",
-  "Maria Luna",
-  "Maria Angelita de Lucena"
-];
