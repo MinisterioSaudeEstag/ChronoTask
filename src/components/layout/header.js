@@ -36,52 +36,56 @@ export default function Header() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-6 ml-8">
-          <Link 
-            href="/dashboard" 
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/dashboard' 
-                ? 'text-primary font-bold' 
+          <Link
+            href="/dashboard"
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard'
+                ? 'text-primary font-bold'
                 : 'text-slate-400 hover:text-foreground'
-            }`}
+              }`}
           >
             <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
 
-          <Link 
-            href="/minhas-atividades" 
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/minhas-atividades' 
-                ? 'text-primary font-bold' 
+          <Link
+            href="/minhas-atividades"
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/minhas-atividades'
+                ? 'text-primary font-bold'
                 : 'text-slate-400 hover:text-foreground'
-            }`}
+              }`}
           >
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
 
-          <Link 
-            href="/home" 
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/home' 
-                ? 'text-primary font-bold' 
+          <Link
+            href="/home"
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/home'
+                ? 'text-primary font-bold'
                 : 'text-slate-400 hover:text-foreground'
-            }`}
+              }`}
           >
             <Users className="w-4 h-4" /> Equipe
           </Link>
 
-          <Link 
-            href="/relatorios" 
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/relatorios' 
-                ? 'text-primary font-bold' 
+          <Link
+            href="/ajuda"
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/ajuda' ? 'text-primary font-bold' : 'text-slate-400 hover:text-foreground'
+              }`}
+          >
+            <HelpCircle className="w-4 h-4" /> Ajuda
+          </Link>
+
+          <Link
+            href="/relatorios"
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/relatorios'
+                ? 'text-primary font-bold'
                 : 'text-slate-400 hover:text-foreground'
-            }`}
+              }`}
           >
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
         </nav>
       </div>
-      
+
       <div className="flex items-center gap-4">
         {/* <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-colors">
           {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}

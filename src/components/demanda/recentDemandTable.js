@@ -22,15 +22,49 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
   ];
 
+  async function logAction(taskId, field, oldVal, newVal, description) {
+    try {
+      await supabase.from('task_history').insert([{
+        task_id: taskId,
+        user_id: user?.id,
+        user_name: user?.full_name || 'Usuário',
+        user_role: user?.role || 'employee',
+        field_changed: field,
+        old_value: oldVal,
+        new_value: newVal,
+        description: description
+      }]);
+    } catch (err) {
+      console.error("Erro ao gravar log:", err);
+    }
+  }
+
   async function handleAddObservation(taskId) {
     const observation = window.prompt("Insira a observação ou devolutiva da demanda:");
     if (observation === null) return;
     if (observation.trim() === "") return;
 
     try {
+      const { data: currentTask } = await supabase
+        .from('tasks')
+        .select('observation')
+        .eq('id', taskId)
+        .single();
+
       const { error } = await supabase.from("tasks").update({ observation }).eq("id", taskId);
       if (error) throw error;
-      toast.success("Observação salva!");
+
+      if (currentTask) {
+        await logAction(
+          taskId, 
+          'observation', 
+          currentTask.observation || '(vazio)', 
+          observation, 
+          `Observação adicionada/atualizada`
+        );
+      }
+
+      toast.success("Observação salva e log registrado!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
       toast.error("Erro ao salvar observação: " + error.message);
@@ -50,12 +84,30 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
     setUpdatingId(taskId);
     try {
+      const { data: currentTask } = await supabase
+        .from('tasks')
+        .select('status')
+        .eq('id', taskId)
+        .single();
+
+      if (!currentTask) throw new Error("Tarefa não encontrada.");
+
       const { error } = await supabase
         .from("tasks")
         .update({ status: newStatus, observation: observation || undefined })
         .eq("id", taskId);
-
       if (error) throw error;
+
+      if (currentTask.status !== newStatus) {
+        await logAction(
+          taskId, 
+          'status', 
+          currentTask.status, 
+          newStatus, 
+          `Status alterado de "${currentTask.status}" para "${newStatus}"`
+        );
+      }
+
       toast.success("Status atualizado!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
@@ -77,6 +129,8 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
         .eq("id", taskId);
 
       if (error) throw error;
+
+      await logAction(taskId, 'delete', taskDescricao, 'EXCLUÍDO', 'Demanda excluída do sistema');
 
       toast.success("Demanda excluída com sucesso!");
       queryClient.invalidateQueries(["demandas"]);
