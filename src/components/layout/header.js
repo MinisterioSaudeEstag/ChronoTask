@@ -3,9 +3,8 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
-import { useDarkMode } from "@/hooks/useDarkMode";
 import { supabase } from "@/lib/supabaseClient";
-import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2 } from "lucide-react";
+import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/notifications/notificationBell";
 
