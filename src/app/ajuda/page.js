@@ -43,7 +43,7 @@ export default function AjudaPage() {
 
         <div className="text-center space-y-4">
           <div className="inline-flex p-4 bg-primary/10 rounded-2xl">
-            <HelpCircle className="w-12 h-12 text-primary" />
+            <HelpCircle className="w-12 h-12 text-primary cursor-pointer" />
           </div>
           <h1 className="text-4xl font-bold tracking-tight">Central de Ajuda</h1>
           <p className="text-slate-500 dark:text-slate-400 text-lg">
@@ -108,11 +108,11 @@ export default function AjudaPage() {
 
         <Card className="bg-primary text-white">
           <CardContent className="p-8 text-center space-y-3">
-            <h3 className="text-xl font-bold">Ainda precisa de ajuda?</h3>
-            <p className="text-slate-200 text-sm">
+            <h3 className="text-xl font-bold text-black">Ainda precisa de ajuda?</h3>
+            <p className="text-sm text-black">
               Entre em contato com a equipe de TI do DITRE/PE ou envie um e-mail para o administrador do sistema.
             </p>
-            <div className="pt-2 text-xs text-slate-300 uppercase tracking-widest">
+            <div className="pt-2 text-xs uppercase tracking-widest text-black">
               COTRE/PE | DITRE/PE
             </div>
           </CardContent>
