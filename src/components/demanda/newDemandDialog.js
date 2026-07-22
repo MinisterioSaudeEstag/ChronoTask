@@ -32,7 +32,11 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
   useEffect(() => {
     if (isOpen) {
       async function fetchFuncs() {
-        const { data } = await supabase.from("profiles").select("id, full_name").neq("role", "admin");
+        const { data } = await supabase
+          .from("profiles")
+          .select("id, full_name, role")
+          .order('full_name', { ascending: true });
+          
         if (data) setFuncionarios(data);
       }
       fetchFuncs();
@@ -157,10 +161,14 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
 
             <form onSubmit={handleSave} className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4">
               <div className="space-y-2">
-                <label className="text-xs font-medium">Funcionário</label>
+                <label className="text-xs font-medium">Funcionário / Responsável</label>
                 <select name="funcionario_id" onChange={handleEmployeeChange} value={formData.funcionario_id} className="w-full p-2 rounded-md border bg-background text-sm" required>
                   <option value="">Selecione...</option>
-                  {funcionarios.map(f => <option key={f.id} value={f.id}>{f.full_name}</option>)}
+                  {funcionarios.map(f => (
+                    <option key={f.id} value={f.id}>
+                      {f.full_name} {f.role === 'admin' ? '(Admin)' : ''}
+                    </option>
+                  ))}
                 </select>
               </div>
               <div className="space-y-2">
@@ -232,12 +240,15 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
                 </div>
               </div>
 
-              {formData.produto !== "Outro" && (
-                <div className="space-y-2 md:col-span-3">
-                  <label className="text-xs font-medium">{formData.conv_type === "TED" ? "Parceiro" : "Convenente"}</label>
-                  <input name="convenente" className="w-full p-2 rounded-md border bg-background text-sm" onChange={handleChange} value={formData.convenente} />
-                </div>
-              )}
+              <div className="space-y-2 md:col-span-3">
+                <label className="text-xs font-medium">{formData.conv_type === "TED" ? "Parceiro" : "Convenente"}</label>
+                <input 
+                  name="convenente" 
+                  className="w-full p-2 rounded-md border bg-background text-sm" 
+                  onChange={handleChange} 
+                  value={formData.convenente} 
+                />
+              </div>
 
               <div className="md:col-span-3 flex justify-end gap-3 mt-4">
                 <Button variant="ghost" type="button" onClick={() => { setIsOpen(false); if (setTaskToEdit) setTaskToEdit(null); }}>Cancelar</Button>
