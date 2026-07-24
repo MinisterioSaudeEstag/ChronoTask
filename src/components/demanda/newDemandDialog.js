@@ -186,6 +186,7 @@ export default function NovaDemandaDialog({ taskToEdit, setTaskToEdit }) {
                   <option value="Ofício">Ofício</option>
                   <option value="Despacho">Despacho</option>
                   <option value="Aceite de Licitação">Aceite de Licitação</option>
+                  <option value="Termo TCE">Termo TCE</option> 
                   <option value="Outro">Outro</option>
                 </select>
               </div>
