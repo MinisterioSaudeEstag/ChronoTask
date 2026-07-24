@@ -48,51 +48,49 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     setObsModalOpen(true);
   }
 
-  async function handleStatusChange(taskId, newStatus) {
-    let observation = "";
+async function handleStatusChange(taskId, newStatus) {
+  setUpdatingId(taskId);
+  try {
+    const { data: currentTask } = await supabase
+      .from('tasks')
+      .select('status')
+      .eq('id', taskId)
+      .single();
+
+    if (!currentTask) throw new Error("Tarefa não encontrada.");
+
+    const { error } = await supabase
+      .from("tasks")
+      .update({ status: newStatus })
+      .eq("id", taskId);
+    if (error) throw error;
+
+    if (currentTask.status !== newStatus) {
+      await logAction(
+        taskId, 
+        'status', 
+        currentTask.status, 
+        newStatus, 
+        `Status alterado de "${currentTask.status}" para "${newStatus}"`
+      );
+    }
+
+    toast.success("Tarefa atualizada!");
+    queryClient.invalidateQueries(["demandas"]);
+
     if (newStatus === "concluida") {
-      observation = window.prompt("Sua demanda foi concluída. Por favor, insira a observação final:");
-      if (observation === null) return;
-      if (observation.trim() === "") {
-        toast.error("A observação é obrigatória para concluir!");
-        return;
+      const taskCompleta = demandas.find(d => d.id === taskId);
+      if (taskCompleta) {
+        setSelectedTaskForObs(taskCompleta);
+        setObsModalOpen(true);
       }
     }
-
-    setUpdatingId(taskId);
-    try {
-      const { data: currentTask } = await supabase
-        .from('tasks')
-        .select('status')
-        .eq('id', taskId)
-        .single();
-
-      if (!currentTask) throw new Error("Tarefa não encontrada.");
-
-      const { error } = await supabase
-        .from("tasks")
-        .update({ status: newStatus, observation: observation || undefined })
-        .eq("id", taskId);
-      if (error) throw error;
-
-      if (currentTask.status !== newStatus) {
-        await logAction(
-          taskId, 
-          'status', 
-          currentTask.status, 
-          newStatus, 
-          `Status alterado de "${currentTask.status}" para "${newStatus}"`
-        );
-      }
-
-      toast.success("Status atualizado!");
-      queryClient.invalidateQueries(["demandas"]);
-    } catch (error) {
-      toast.error("Erro: " + error.message);
-    } finally {
-      setUpdatingId(null);
-    }
+  } catch (error) {
+    toast.error("Erro: " + error.message);
+  } finally {
+    setUpdatingId(null);
   }
+}
 
   async function handleDelete(taskId, taskDescricao) {
     const confirmar = window.confirm(`Tem certeza que deseja EXCLUIR a demanda "${taskDescricao}"?\n\nEsta ação não pode ser desfeita.`);
