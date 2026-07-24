@@ -7,12 +7,16 @@ import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { toast } from 'sonner';
+import ObservationModal from "../demanda/observationModal";
 
 export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
+  
+  const [obsModalOpen, setObsModalOpen] = useState(false);
+  const [selectedTaskForObs, setSelectedTaskForObs] = useState(null);
 
   const STATUS_OPTIONS = [
     { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
@@ -39,36 +43,9 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     }
   }
 
-  async function handleAddObservation(taskId) {
-    const observation = window.prompt("Insira a observação ou devolutiva da demanda:");
-    if (observation === null) return;
-    if (observation.trim() === "") return;
-
-    try {
-      const { data: currentTask } = await supabase
-        .from('tasks')
-        .select('observation')
-        .eq('id', taskId)
-        .single();
-
-      const { error } = await supabase.from("tasks").update({ observation }).eq("id", taskId);
-      if (error) throw error;
-
-      if (currentTask) {
-        await logAction(
-          taskId, 
-          'observation', 
-          currentTask.observation || '(vazio)', 
-          observation, 
-          `Observação adicionada/atualizada`
-        );
-      }
-
-      toast.success("Observação salva e log registrado!");
-      queryClient.invalidateQueries(["demandas"]);
-    } catch (error) {
-      toast.error("Erro ao salvar observação: " + error.message);
-    }
+  function openObservationModal(task) {
+    setSelectedTaskForObs(task);
+    setObsModalOpen(true);
   }
 
   async function handleStatusChange(taskId, newStatus) {
@@ -170,7 +147,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                   <td className="px-4 py-3">
                     <div className="flex flex-col gap-1">
                       <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
-                      {item.observation && (
+                      {item.observation && !obsModalOpen && (
                         <div className="flex items-start gap-1 text-[10px] italic text-emerald-600 dark:text-emerald-400">
                           <MessageSquare className="w-3 h-3 mt-0.5" /> {item.observation}
                         </div>
@@ -239,7 +216,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                         variant="ghost"
                         size="sm"
                         className="h-8 px-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all cursor-pointer"
-                        onClick={() => handleAddObservation(item.id)}
+                        onClick={() => openObservationModal(item)}
                       >
                         <MessageSquare className="w-3 h-3 mr-1" /> obs
                       </Button>
@@ -273,6 +250,13 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
           </tbody>
         </table>
       </div>
+
+      <ObservationModal
+        taskId={selectedTaskForObs?.id}
+        taskDescricao={selectedTaskForObs?.descricao}
+        isOpen={obsModalOpen}
+        onClose={() => setObsModalOpen(false)}
+      />
     </section>
   );
 }
