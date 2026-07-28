@@ -1,128 +1,201 @@
 'use client';
 
 import React, { useState } from "react";
-import { ExternalLink, Clock, Loader2 } from "lucide-react";
+import { ExternalLink, Clock, Loader2, MessageSquare, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
+import { toast } from 'sonner';
+import ObservationModal from "../demanda/observationModal";
 
-export default function DemandasRecentesTable({ demandas, isAdmin }) {
+export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
+  const [deletingId, setDeletingId] = useState(null);
+  
+  // Estados para o Modal de Observações
+  const [obsModalOpen, setObsModalOpen] = useState(false);
+  const [selectedTaskForObs, setSelectedTaskForObs] = useState(null);
 
   const STATUS_OPTIONS = [
+    { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
     { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
     { value: "em_andamento", label: "Em Andamento", color: "bg-blue-100 text-blue-700" },
     { value: "concluida", label: "Concluída", color: "bg-emerald-100 text-emerald-700" },
     { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
   ];
 
-  const generateProcessLink = (numero) => `https://sei.saude.gov.br/processo/${numero}`;
-
-async function handleStatusChange(taskId, newStatus) {
-  setUpdatingId(taskId);
-  try {
-    const { data: currentTask } = await supabase
-      .from('tasks')
-      .select('status')
-      .eq('id', taskId)
-      .single();
-
-    if (!currentTask) throw new Error("Tarefa não encontrada.");
-
-    const updateData = { status: newStatus };
-    
-    if (newStatus === "concluida") {
-      updateData.completed_at = new Date().toISOString();
+  // Função de auditoria
+  async function logAction(taskId, field, oldVal, newVal, description) {
+    try {
+      await supabase.from('task_history').insert([{
+        task_id: taskId,
+        user_id: user?.id,
+        user_name: user?.full_name || 'Usuário',
+        user_role: user?.role || 'employee',
+        field_changed: field,
+        old_value: oldVal,
+        new_value: newVal,
+        description: description
+      }]);
+    } catch (err) {
+      console.error("Erro ao gravar log:", err);
     }
-    else if (currentTask.status === "concluida") {
-      updateData.completed_at = null;
-    }
-
-    const { error } = await supabase
-      .from("tasks")
-      .update(updateData)
-      .eq("id", taskId);
-    if (error) throw error;
-
-    if (currentTask.status !== newStatus) {
-      await logAction(
-        taskId, 
-        'status', 
-        currentTask.status, 
-        newStatus, 
-        `Status alterado de "${currentTask.status}" para "${newStatus}"`
-      );
-    }
-
-    toast.success("Status atualizado!");
-    queryClient.invalidateQueries(["demandas"]);
-
-    if (newStatus === "concluida") {
-      const taskCompleta = demandas.find(d => d.id === taskId);
-      if (taskCompleta) {
-        setSelectedTaskForObs(taskCompleta);
-        setObsModalOpen(true);
-      }
-    }
-  } catch (error) {
-    toast.error("Erro: " + error.message);
-  } finally {
-    setUpdatingId(null);
   }
-}
+
+  function openObservationModal(task) {
+    setSelectedTaskForObs(task);
+    setObsModalOpen(true);
+  }
+
+  async function handleStatusChange(taskId, newStatus) {
+    setUpdatingId(taskId);
+    try {
+      // 1. Pega o status atual ANTES de salvar
+      const { data: currentTask } = await supabase
+        .from('tasks')
+        .select('status')
+        .eq('id', taskId)
+        .single();
+
+      if (!currentTask) throw new Error("Tarefa não encontrada.");
+
+      // 2. Define os dados para atualizar
+      const updateData = { status: newStatus };
+      
+      // 3. Registra data de conclusão se for 'concluida'
+      if (newStatus === "concluida") {
+        updateData.completed_at = new Date().toISOString();
+      } else if (currentTask.status === "concluida") {
+        updateData.completed_at = null;
+      }
+
+      // 4. Salva no banco
+      const { error } = await supabase
+        .from("tasks")
+        .update(updateData)
+        .eq("id", taskId);
+      if (error) throw error;
+
+      // 5. Grava log de auditoria
+      if (currentTask.status !== newStatus) {
+        await logAction(
+          taskId, 
+          'status', 
+          currentTask.status, 
+          newStatus, 
+          `Status alterado de "${currentTask.status}" para "${newStatus}"`
+        );
+      }
+
+      toast.success("Status atualizado!");
+      queryClient.invalidateQueries(["demandas"]);
+
+      // 6. Se concluída, abre o modal de observação
+      if (newStatus === "concluida") {
+        const taskCompleta = demandas.find(d => d.id === taskId);
+        if (taskCompleta) {
+          setSelectedTaskForObs(taskCompleta);
+          setObsModalOpen(true);
+        }
+      }
+    } catch (error) {
+      toast.error("Erro: " + error.message);
+    } finally {
+      setUpdatingId(null);
+    }
+  }
+
+  async function handleDelete(taskId, taskDescricao) {
+    const confirmar = window.confirm(`Tem certeza que deseja EXCLUIR a demanda "${taskDescricao}"?\n\nEsta ação não pode ser desfeita.`);
+    if (!confirmar) return;
+
+    try {
+      setDeletingId(taskId);
+      const { error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", taskId);
+
+      if (error) throw error;
+
+      await logAction(taskId, 'delete', taskDescricao, 'EXCLUÍDO', 'Demanda excluída do sistema');
+
+      toast.success("Demanda excluída com sucesso!");
+      queryClient.invalidateQueries(["demandas"]);
+      queryClient.invalidateQueries(["equipe"]);
+    } catch (error) {
+      toast.error("Erro ao deletar: " + error.message);
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   return (
     <section className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-foreground">Demandas Recentes</h2>
-      </div>
-
       <div className="overflow-x-auto rounded-xl border border-border/60 bg-white dark:bg-slate-900">
         <table className="w-full text-sm text-left">
           <thead className="bg-slate-50 dark:bg-slate-800 text-muted-foreground uppercase text-[10px] font-bold">
-            <tr>
+            <tr className="border-b border-white/5">
               <th className="px-4 py-3">Funcionário</th>
               <th className="px-4 py-3">Demanda / Produto</th>
               <th className="px-4 py-3">Processo</th>
+              <th className="px-4 py-3">Convênio</th>
               <th className="px-4 py-3">Início / Término</th>
               <th className="px-4 py-3">Carga Horária</th>
               <th className="px-4 py-3">Status</th>
-              {isAdmin && <th className="px-4 py-3 text-center">Ações</th>}
+              <th className="px-4 py-3 text-center">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border/60">
             {demandas.length === 0 ? (
               <tr>
-                <td colSpan="7" className="px-4 py-8 text-center text-muted-foreground">Nenhuma demanda encontrada.</td>
+                <td colSpan="8" className="px-4 py-20 text-center">Nenhuma demanda encontrada.</td>
               </tr>
             ) : (
               demandas.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 dark:hover:bg-slate-800/50 transition-colors">
                   <td className="px-4 py-3 font-medium">{item.funcionario_nome}</td>
                   <td className="px-4 py-3">
-                    <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
-                    <p className="text-xs text-muted-foreground">{item.produto}</p>
+                    <div className="flex flex-col gap-1">
+                      <p className="font-medium truncate max-w-[200px]">{item.descricao}</p>
+                      <p className="text-xs text-muted-foreground">{item.produto}</p>
+                    </div>
                   </td>
                   <td className="px-4 py-3">
-                    <a 
-                      href={generateProcessLink(item.processo)} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-1 text-primary hover:underline font-medium"
-                    >
-                      {item.processo} <ExternalLink className="w-3 h-3" />
-                    </a>
+                    {item.processo && item.processo.length >= 4 && item.processo !== "0000000" ? (
+                      <button
+                        onClick={() => {
+                          navigator.clipboard.writeText(item.processo);
+                          toast.success("Número do processo copiado!");
+                        }}
+                        className="flex items-center gap-1 text-primary hover:underline font-medium transition-all hover:scale-105"
+                      >
+                        {item.processo} <ExternalLink className="w-3 h-3" />
+                      </button>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-slate-400 text-xs italic">
+                        Não informado
+                      </span>
+                    )}
+                  </td>
+                  <td className="px-4 py-3 text-xs font-medium">
+                    {item.convenio ? `${item.convenio} ${item.conv_year ? `| ${item.conv_year}` : ""}` : "-"}
                   </td>
                   <td className="px-4 py-3">
-                    <p className="text-xs">Início: {item.start_date}</p>
-                    <p className="text-xs font-semibold">Retorno: {item.expected_date}</p>
+                    <p className="text-xs">Início: {item.start_date || "-"}</p>
+                    <p className="text-xs font-semibold">Retorno: {item.expected_date || "-"}</p>
                   </td>
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-1 text-muted-foreground">
-                      <Clock className="w-3 h-3" /> {item.expected_time}h
+                      <Clock className="w-3 h-3" />
+                      <span className="font-medium">
+                        {(item.expected_time !== null && item.expected_time !== undefined && item.expected_time !== "")
+                          ? `${item.expected_time}h`
+                          : "-"}
+                      </span>
                     </div>
                   </td>
                   <td className="px-4 py-3">
@@ -132,7 +205,7 @@ async function handleStatusChange(taskId, newStatus) {
                           <Loader2 className="w-3 h-3 animate-spin text-primary" />
                         </div>
                       )}
-                      <select 
+                      <select
                         value={item.status}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
                         disabled={updatingId === item.id || (!isAdmin && item.funcionario_id !== user?.id)}
@@ -146,17 +219,59 @@ async function handleStatusChange(taskId, newStatus) {
                       </select>
                     </div>
                   </td>
-                  {isAdmin && (
-                    <td className="px-4 py-3 text-center">
-                      <Button variant="ghost" size="sm" className="h-8 px-2">Editar</Button>
-                    </td>
-                  )}
+                  <td className="px-4 py-3 flex justify-center gap-2">
+                    {!isAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-8 px-2 bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500 hover:text-white transition-all cursor-pointer"
+                        onClick={() => openObservationModal(item)}
+                      >
+                        <MessageSquare className="w-3 h-3 mr-1" /> obs
+                      </Button>
+                    )}
+
+                    {isAdmin && (
+                      <>
+                        {/* BOTÃO EDITAR COM onClick E cursor-pointer */}
+                        <Button 
+                          variant="ghost" 
+                          size="sm" 
+                          className="h-8 px-2 cursor-pointer text-slate-700 hover:text-primary transition-colors" 
+                          onClick={() => onEdit(item)}
+                        >
+                          Editar
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={deletingId === item.id}
+                          className="h-8 px-2 bg-red-500/10 text-red-600 hover:bg-red-600 hover:text-white transition-all cursor-pointer"
+                          onClick={() => handleDelete(item.id, item.descricao)}
+                        >
+                          {deletingId === item.id ? (
+                            <Loader2 className="w-3 h-3 animate-spin" />
+                          ) : (
+                            <Trash2 className="w-3 h-3" />
+                          )}
+                        </Button>
+                      </>
+                    )}
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      <ObservationModal
+        taskId={selectedTaskForObs?.id}
+        taskDescricao={selectedTaskForObs?.descricao}
+        isOpen={obsModalOpen}
+        onClose={() => setObsModalOpen(false)}
+      />
     </section>
   );
 }
