@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, User, ExternalLink, Hourglass, X } from "lucide-react";
+import { Users, User, ExternalLink, Hourglass, X, CheckCircle2, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
 
@@ -24,7 +24,7 @@ export default function HomeEquipe() {
       if (!selectedEmployee) return [];
       const { data } = await supabase
         .from("tasks")
-        .select("*, profiles:admin_id(full_name)")
+        .select("*, profiles:admin_id(full_name), completed_at")
         .eq("funcionario_id", selectedEmployee.id)
         .order("created_at", { ascending: false });
       return data || [];
@@ -68,16 +68,15 @@ export default function HomeEquipe() {
       {selectedEmployee && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="relative bg-white dark:bg-slate-900 w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl overflow-hidden flex flex-col">
-
+            
             <div className="px-6 py-4 border-b border-border/60 flex justify-between items-center bg-primary text-white shrink-0">
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5" />
-                <h3 className="font-bold text-lg text-black">Atividades de {selectedEmployee.full_name}</h3>
+                <h3 className="font-bold text-lg">Atividades de {selectedEmployee.full_name}</h3>
               </div>
-
               <button 
                 onClick={() => setSelectedEmployee(null)} 
-                className="z-50 text-primary hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center text-black bg-red-400 dark:bg-slate-800 dark:text-white dark:hover:bg-slate-700"
+                className="z-50 bg-white text-primary hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center"
                 aria-label="Fechar modal"
                 type="button"
               >
@@ -96,7 +95,8 @@ export default function HomeEquipe() {
                     <tr>
                       <th className="px-4 py-4">Atividade / Produto</th>
                       <th className="px-4 py-4">Atribuído por</th>
-                      <th className="px-4 py-4 min-w-[220px]">Prazo / Hora</th>
+                      <th className="px-4 py-4 min-w-[240px]">Prazo / Hora</th>
+                      <th className="px-4 py-4">Devolução</th>
                       <th className="px-4 py-4">Processo</th>
                       <th className="px-4 py-4">Convênio / TED</th>
                       <th className="px-4 py-4">Status</th>
@@ -131,6 +131,31 @@ export default function HomeEquipe() {
                             <span className="text-amber-600 text-sm font-medium">A definir</span>
                           )}
                         </td>
+
+                        <td className="px-4 py-4 align-top">
+                          {task.completed_at ? (
+                            <div className="flex items-start gap-2">
+                              <div className="p-1.5 bg-emerald-100 dark:bg-emerald-900/30 rounded-md text-emerald-700 dark:text-emerald-400 shrink-0">
+                                <CheckCircle2 className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <p className="text-[11px] text-emerald-700 dark:text-emerald-400 uppercase font-bold tracking-wider">Devolvida em</p>
+                                <p className="text-sm font-bold text-emerald-800 dark:text-emerald-300">
+                                  {new Date(task.completed_at).toLocaleDateString('pt-BR')}
+                                </p>
+                                <p className="text-[11px] text-slate-500 font-medium mt-0.5">
+                                  às {new Date(task.completed_at).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
+                                </p>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="flex items-center gap-2 text-slate-400 text-xs italic">
+                              <Calendar className="w-3 h-3" />
+                              <span>Aguardando devolução</span>
+                            </div>
+                          )}
+                        </td>
+
                         <td className="px-4 py-4 align-top">
                           {task.processo ? (
                             <button onClick={() => { navigator.clipboard.writeText(task.processo); toast.success("Copiado!"); }} className="text-primary flex items-center gap-1 hover:underline font-medium text-sm">
@@ -156,7 +181,9 @@ export default function HomeEquipe() {
                         <td className="px-4 py-4 align-top">
                           <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
                             task.status === 'concluida' ? 'bg-emerald-100 text-emerald-700' :
-                            task.status === 'em_andamento' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'
+                            task.status === 'em_andamento' ? 'bg-blue-100 text-blue-700' :
+                            task.status === 'atrasada' ? 'bg-red-100 text-red-700' :
+                            task.status === 'nao_iniciado' ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-700'
                           }`}>
                             {task.status.replace('_', ' ')}
                           </span>
