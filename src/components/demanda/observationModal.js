@@ -98,7 +98,7 @@ export default function ObservationModal({ taskId, taskDescricao, isOpen, onClos
               className="w-full p-3 text-sm border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary outline-none resize-none"
             />
             <div className="flex justify-end">
-              <Button type="submit" className="bg-primary hover:bg-primary-dark text-white gap-2">
+              <Button type="submit" className="bg-primary hover:bg-primary-dark text-black gap-2">
                 <Send className="w-4 h-4" /> Enviar para o Histórico
               </Button>
             </div>

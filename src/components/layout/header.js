@@ -7,8 +7,11 @@ import { supabase } from "@/lib/supabaseClient";
 import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2, HelpCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/notifications/notificationBell";
+import { useAutoCheckOverdue } from "../../hooks/useAutoCheckOverdue";
 
 export default function Header() {
+  useAutoCheckOverdue();
+
   const pathname = usePathname();
   const { user } = useAuth();
   // const { isDark, toggleTheme } = useDarkMode();
