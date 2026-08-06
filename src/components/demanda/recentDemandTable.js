@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { ExternalLink, Clock, Loader2, MessageSquare, Trash2 } from "lucide-react";
+import { ExternalLink, Clock, Loader2, MessageSquare, Trash2, MessageCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -50,6 +50,11 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   function openObservationModal(task) {
     setSelectedTaskForObs(task);
     setObsModalOpen(true);
+  }
+
+  function openChatModal(task) {
+    setSelectedTaskForChat(task);
+    setChatModalOpen(true);
   }
 
   async function handleStatusChange(taskId, newStatus) {
@@ -216,6 +221,16 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     </div>
                   </td>
                   <td className="px-4 py-3 flex justify-center gap-2">
+                    
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 px-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
+                      onClick={() => openChatModal(item)}
+                    >
+                      <MessageCircle className="w-3 h-3 mr-1" /> Chat
+                    </Button>
+
                     {!isAdmin && (
                       <Button
                         variant="ghost"
@@ -251,18 +266,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                             <Trash2 className="w-3 h-3" />
                           )}
                         </Button>
-
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          className="h-8 bg-blue-500/10 text-blue-600 hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
-                          onClick={() => {
-                            setSelectedTaskForChat(item);
-                            setChatModalOpen(true);
-                          }}
-                        >
-                          Chat
-                        </Button>
                       </>
                     )}
                   </td>
@@ -280,12 +283,12 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
         onClose={() => setObsModalOpen(false)}
       />
 
-      <ChatModal>
+      <ChatModal
         taskId={selectedTaskForChat?.id}
         taskDescricao={selectedTaskForChat?.descricao}
         isOpen={chatModalOpen}
         onClose={() => setChatModalOpen(false)}
-      </ChatModal>
+      />
     </section>
   );
 }
