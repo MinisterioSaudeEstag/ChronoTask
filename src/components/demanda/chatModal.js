@@ -87,11 +87,11 @@ export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
           <div className="flex items-center gap-2 truncate">
             <MessageCircle className="w-5 h-5 shrink-0" />
             <div className="truncate">
-              <h3 className="font-bold text-sm">Chat da Demanda</h3>
-              <p className="text-[11px] text-blue-100 truncate">{taskDescricao}</p>
+              <h3 className="font-bold text-sm text-black">Chat da Demanda</h3>
+              <p className="text-[11px] text-black truncate">{taskDescricao}</p>
             </div>
           </div>
-          <button onClick={onClose} className="text-white hover:bg-white/20 p-1 rounded-full shrink-0">
+          <button onClick={onClose} className="text-red-500 hover:bg-red-500/20 p-1 rounded-full shrink-0">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -140,8 +140,8 @@ export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
             placeholder="Digite sua mensagem..."
             className="flex-1 p-2 text-sm border border-border rounded-lg bg-background focus:ring-2 focus:ring-primary outline-none"
           />
-          <Button type="submit" disabled={!newMessage.trim()} className="bg-primary hover:bg-primary-dark text-white p-2 h-10 w-10 shrink-0">
-            <Send className="w-4 h-4" />
+          <Button type="submit" disabled={!newMessage.trim()} className="bg-primary hover:bg-primary-dark text-black p-2 h-10 w-10 shrink-0">
+            <Send className="w-4 h-4 text-black" />
           </Button>
         </form>
       </div>
