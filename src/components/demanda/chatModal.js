@@ -85,7 +85,7 @@ export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
         
         <div className="px-6 py-4 border-b flex justify-between items-center bg-primary text-white rounded-t-xl">
           <div className="flex items-center gap-2 truncate">
-            <MessageCircle className="w-5 h-5 shrink-0" />
+            <MessageCircle className="w-5 h-5 shrink-0 text-black" />
             <div className="truncate">
               <h3 className="font-bold text-sm text-black">Chat da Demanda</h3>
               <p className="text-[11px] text-black truncate">{taskDescricao}</p>
