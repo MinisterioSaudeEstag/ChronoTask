@@ -112,8 +112,8 @@ export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
                 <div key={msg.id} className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
                   <div className={`max-w-[80%] p-3 rounded-2xl shadow-sm ${
                     isMe 
-                      ? 'bg-primary text-white rounded-br-none' 
-                      : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white rounded-bl-none'
+                      ? 'bg-primary text-black rounded-br-none' 
+                      : 'bg-white dark:bg-slate-700 text-slate-900 dark:text-black rounded-bl-none'
                   }`}>
                     {!isMe && (
                       <p className={`text-[10px] font-bold mb-1 flex items-center gap-1 ${msg.user_role === 'admin' ? 'text-amber-500' : 'text-primary'}`}>
