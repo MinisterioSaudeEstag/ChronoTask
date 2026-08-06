@@ -8,6 +8,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "@/lib/authContext";
 import { toast } from 'sonner';
 import ObservationModal from "../demanda/observationModal";
+import ChatModal from "../demanda/chatModal";
 
 export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
@@ -15,9 +16,11 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   
-  // Estados para o Modal de Observações
   const [obsModalOpen, setObsModalOpen] = useState(false);
   const [selectedTaskForObs, setSelectedTaskForObs] = useState(null);
+
+  const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [selectedTaskForChat, setSelectedTaskForChat] = useState(null);
 
   const STATUS_OPTIONS = [
     { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
@@ -27,7 +30,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
   ];
 
-  // Função de auditoria
   async function logAction(taskId, field, oldVal, newVal, description) {
     try {
       await supabase.from('task_history').insert([{
@@ -53,7 +55,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   async function handleStatusChange(taskId, newStatus) {
     setUpdatingId(taskId);
     try {
-      // 1. Pega o status atual ANTES de salvar
       const { data: currentTask } = await supabase
         .from('tasks')
         .select('status')
@@ -62,24 +63,20 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
       if (!currentTask) throw new Error("Tarefa não encontrada.");
 
-      // 2. Define os dados para atualizar
       const updateData = { status: newStatus };
       
-      // 3. Registra data de conclusão se for 'concluida'
       if (newStatus === "concluida") {
         updateData.completed_at = new Date().toISOString();
       } else if (currentTask.status === "concluida") {
         updateData.completed_at = null;
       }
 
-      // 4. Salva no banco
       const { error } = await supabase
         .from("tasks")
         .update(updateData)
         .eq("id", taskId);
       if (error) throw error;
 
-      // 5. Grava log de auditoria
       if (currentTask.status !== newStatus) {
         await logAction(
           taskId, 
@@ -93,7 +90,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
       toast.success("Status atualizado!");
       queryClient.invalidateQueries(["demandas"]);
 
-      // 6. Se concluída, abre o modal de observação
       if (newStatus === "concluida") {
         const taskCompleta = demandas.find(d => d.id === taskId);
         if (taskCompleta) {
@@ -233,7 +229,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
                     {isAdmin && (
                       <>
-                        {/* BOTÃO EDITAR COM onClick E cursor-pointer */}
                         <Button 
                           variant="ghost" 
                           size="sm" 
@@ -256,6 +251,18 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                             <Trash2 className="w-3 h-3" />
                           )}
                         </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 bg-blue-500/10 text-blue-600 hover:bg-blue-600 hover:text-white transition-all cursor-pointer"
+                          onClick={() => {
+                            setSelectedTaskForChat(item);
+                            setChatModalOpen(true);
+                          }}
+                        >
+                          Chat
+                        </Button>
                       </>
                     )}
                   </td>
@@ -272,6 +279,13 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
         isOpen={obsModalOpen}
         onClose={() => setObsModalOpen(false)}
       />
+
+      <ChatModal>
+        taskId={selectedTaskForChat?.id}
+        taskDescricao={selectedTaskForChat?.descricao}
+        isOpen={chatModalOpen}
+        onClose={() => setChatModalOpen(false)}
+      </ChatModal>
     </section>
   );
 }
