@@ -229,7 +229,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="h-8 px-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
+                      className="relative h-8 px-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
                       onClick={() => {
                         openChatModal(item);
                         markAsRead(item.id);
