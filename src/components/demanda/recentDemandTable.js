@@ -9,18 +9,22 @@ import { useAuth } from "@/lib/authContext";
 import { toast } from 'sonner';
 import ObservationModal from "../demanda/observationModal";
 import ChatModal from "../demanda/chatModal";
+import { useUnreadChat } from "../../hooks/useUnreadChat";
+
 
 export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-  
+
   const [obsModalOpen, setObsModalOpen] = useState(false);
   const [selectedTaskForObs, setSelectedTaskForObs] = useState(null);
 
   const [chatModalOpen, setChatModalOpen] = useState(false);
   const [selectedTaskForChat, setSelectedTaskForChat] = useState(null);
+
+  const { unreadMap, markAsRead } = useUnreadChat(demandas);
 
   const STATUS_OPTIONS = [
     { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
@@ -69,7 +73,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
       if (!currentTask) throw new Error("Tarefa não encontrada.");
 
       const updateData = { status: newStatus };
-      
+
       if (newStatus === "concluida") {
         updateData.completed_at = new Date().toISOString();
       } else if (currentTask.status === "concluida") {
@@ -84,10 +88,10 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
       if (currentTask.status !== newStatus) {
         await logAction(
-          taskId, 
-          'status', 
-          currentTask.status, 
-          newStatus, 
+          taskId,
+          'status',
+          currentTask.status,
+          newStatus,
           `Status alterado de "${currentTask.status}" para "${newStatus}"`
         );
       }
@@ -221,14 +225,23 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                     </div>
                   </td>
                   <td className="px-4 py-3 flex justify-center gap-2">
-                    
+
                     <Button
                       variant="ghost"
                       size="sm"
                       className="h-8 px-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
-                      onClick={() => openChatModal(item)}
+                      onClick={() => {
+                        openChatModal(item);
+                        markAsRead(item.id);
+                      }}
                     >
                       <MessageCircle className="w-3 h-3 mr-1" /> Chat
+
+                      {unreadMap[item.id] > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm animate-pulse">
+                          {unreadMap[item.id]}
+                        </span>
+                      )}
                     </Button>
 
                     {!isAdmin && (
@@ -244,10 +257,10 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
                     {isAdmin && (
                       <>
-                        <Button 
-                          variant="ghost" 
-                          size="sm" 
-                          className="h-8 px-2 cursor-pointer text-slate-700 hover:text-primary transition-colors" 
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 cursor-pointer text-slate-700 hover:text-primary transition-colors"
                           onClick={() => onEdit(item)}
                         >
                           Editar
