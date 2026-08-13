@@ -1,24 +1,13 @@
-import { AuthProvider } from "@/lib/authContext";
-import QueryProvider from "@/lib/queryProvider";
-import Header from "@/components/layout/header";
-import Footer from "@/components/layout/footer";
-import { Toaster } from 'sonner';
+import { Inter } from "next/font/google";
 import "./globals.css";
+
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="pt-br">
-      <body className="min-h-screen flex flex-col bg-background">
-        <QueryProvider> 
-          <AuthProvider>
-            <Header /> 
-            <main className="flex-grow">
-              {children}
-            </main>
-            <Footer />
-            <Toaster position="top-right" richColors />
-          </AuthProvider>
-        </QueryProvider>
+    <html lang="pt-br" className={inter.variable}>
+      <body className="font-sans bg-slate-50 text-slate-900 antialiased">
+        {children}
       </body>
     </html>
   );

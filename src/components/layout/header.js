@@ -68,7 +68,11 @@ export default function Header() {
             <Users className="w-4 h-4" /> Equipe
           </Link>
 
-          <Link href="/calendario" className="flex items-center gap-2 text-sm font-medium ...">
+          <Link href="/calendario" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/calendario'
+              ? 'text-primary font-bold'
+              : 'text-slate-400 hover:text-foreground'
+              }`}>
+
             <Calendar className="w-4 h-4" /> Calendário
           </Link>
 
@@ -93,10 +97,6 @@ export default function Header() {
       </div>
 
       <div className="flex items-center gap-4">
-        {/* <button onClick={toggleTheme} className="p-2 rounded-full hover:bg-white/5 transition-colors">
-          {isDark ? <Sun className="w-5 h-5 text-amber-400" /> : <Moon className="w-5 h-5 text-slate-600" />}
-        </button> */}
-
         <NotificationBell />
 
         <div className="flex items-center gap-3 pl-4 border-l border-white/10">

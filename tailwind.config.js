@@ -8,13 +8,10 @@ module.exports = {
   ],
   theme: {
     extend: {
-      colors: {
-        primary: "#004785",
-        cream: "#fdfbf7",
-        darkBg: "#0f172a",
-        darkCard: "#1e293b",
-      },
+    fontFamily: {
+      sans: ["var(--font-inter)", "system-ui", "sans-serif"],
     },
   },
+},
   plugins: [],
 }
