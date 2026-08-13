@@ -1,8 +1,7 @@
 "use client";
-
 import React, { useState, useMemo } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
-import { format, parse, startOfWeek, getDay, isSameDay } from "date-fns";
+import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useQuery } from "@tanstack/react-query";
@@ -20,12 +19,14 @@ export default function CalendarioPage() {
   const [view, setView] = useState("month");
   const [currentDate, setCurrentDate] = useState(new Date());
 
-  const { data: tarefas = [] } = useQuery({
+  const { data: tarefas = [], isLoading } = useQuery({
     queryKey: ["calendario_tarefas"],
     queryFn: async () => {
       const { data } = await supabase.from("tasks").select("*");
       return data || [];
     },
+    enabled: typeof window !== "undefined", 
+    staleTime: 1000 * 60, 
   });
 
   const statusConfig = {
@@ -89,16 +90,13 @@ export default function CalendarioPage() {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-7xl mx-auto space-y-8">
-        
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#004785] rounded-xl shadow-sm">
-              <CalendarIcon className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-3xl font-bold tracking-tight text-slate-900">Calendário de Demandas</h1>
-              <p className="text-slate-500 text-sm">Gestão visual de prazos e produtividade</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="p-3 bg-[#004785] rounded-xl shadow-sm">
+            <CalendarIcon className="w-6 h-6 text-white" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">Calendário de Demandas</h1>
+            <p className="text-slate-500 text-sm">Gestão visual de prazos e produtividade</p>
           </div>
         </div>
 
@@ -110,27 +108,33 @@ export default function CalendarioPage() {
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200" style={{ height: '650px' }}>
-          <Calendar
-            localizer={localizer}
-            events={eventos}
-            startAccessor="start"
-            endAccessor="end"
-            style={{ height: '100%' }}
-            views={["month", "week", "day", "agenda"]}
-            view={view}
-            date={currentDate}
-            onView={(v) => setView(v)}
-            onNavigate={(d) => setCurrentDate(d)}
-            eventPropGetter={eventStyleGetter}
-            culture="pt-BR"
-            messages={{
-              next: "Próximo", previous: "Anterior", today: "Hoje",
-              month: "Mês", week: "Semana", day: "Dia", agenda: "Agenda",
-              date: "Data", time: "Hora", event: "Demanda",
-              noEventsInRange: "Nenhuma demanda neste período.",
-              showMore: (total) => `+ ${total} demandas`,
-            }}
-          />
+          {isLoading ? (
+            <div className="flex items-center justify-center h-full text-slate-400">
+              Carregando calendário...
+            </div>
+          ) : (
+            <Calendar
+              localizer={localizer}
+              events={eventos}
+              startAccessor="start"
+              endAccessor="end"
+              style={{ height: '100%' }}
+              views={["month", "week", "day", "agenda"]}
+              view={view}
+              date={currentDate}
+              onView={(v) => setView(v)}
+              onNavigate={(d) => setCurrentDate(d)}
+              eventPropGetter={eventStyleGetter}
+              culture="pt-BR"
+              messages={{
+                next: "Próximo", previous: "Anterior", today: "Hoje",
+                month: "Mês", week: "Semana", day: "Dia", agenda: "Agenda",
+                date: "Data", time: "Hora", event: "Demanda",
+                noEventsInRange: "Nenhuma demanda neste período.",
+                showMore: (total) => `+ ${total} demandas`,
+              }}
+            />
+          )}
         </div>
 
         <div className="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
@@ -162,41 +166,41 @@ export default function CalendarioPage() {
                   const progresso = membro.total > 0 ? Math.round((membro.concluidas / membro.total) * 100) : 0;
                   return (
                     <tr key={idx} className="hover:bg-slate-50/50 transition-colors">
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div 
-                            className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm"
+                            className="w-9 h-9 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm shrink-0"
                             style={{ backgroundColor: membro.color }}
                           >
                             {membro.nome.charAt(0)}
                           </div>
-                          <span className="font-semibold text-slate-800">{membro.nome}</span>
+                          <span className="font-semibold text-slate-800 truncate max-w-[150px]">{membro.nome}</span>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-center font-bold text-slate-700">{membro.total}</td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center font-bold text-slate-700">{membro.total}</td>
+                      <td className="px-4 py-3 text-center">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
                           {membro.andamento}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-amber-50 text-amber-700">
                           {membro.pendentes}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-700">
                           {membro.atrasadas}
                         </span>
                       </td>
-                      <td className="px-6 py-4 text-center">
+                      <td className="px-4 py-3 text-center">
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-50 text-emerald-700">
                           {membro.concluidas}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                          <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden min-w-[60px]">
                             <div 
                               className="h-full bg-gradient-to-r from-emerald-400 to-emerald-600 rounded-full transition-all duration-700"
                               style={{ width: `${progresso}%` }}
