@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { supabase } from "../lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 import { useAuth } from "../lib/authContext";
@@ -7,6 +7,7 @@ export function useUnreadChat(demandas) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [unreadMap, setUnreadMap] = useState({});
+  const lastLocalUpdate = useRef(0);
 
   useEffect(() => {
     if (!user || !demandas || demandas.length === 0) return;
@@ -28,22 +29,34 @@ export function useUnreadChat(demandas) {
           counts[msg.task_id] = (counts[msg.task_id] || 0) + 1;
         }
       });
+
+      const timeSinceLocalUpdate = Date.now() - lastLocalUpdate.current;
+      if (timeSinceLocalUpdate < 3000) {
+        console.log("Ignorando re-busca por atualização local recente.");
+        return;
+      }
+
       setUnreadMap(counts);
     }
 
     fetchUnread();
 
+    const tarefasIds = demandas.map(d => d.id).join(",");
+
     const channel = supabase
-      .channel('unread_chat_global')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_messages' }, () => {
-      fetchUnread();
-    })
-    .subscribe();
+      .channel('unread_chat_v2')
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_messages' }, (payload) => {
+        if (payload.new?.user_id === user.id) return;
+        fetchUnread();
+      })
+      .subscribe();
 
     return () => { supabase.removeChannel(channel); };
   }, [user, JSON.stringify(demandas)]);
 
   async function markAsRead(taskId) {
+    lastLocalUpdate.current = Date.now();
+    
     try {
       const { error } = await supabase
         .from("task_messages")
@@ -54,10 +67,13 @@ export function useUnreadChat(demandas) {
       
       if (error) throw error;
 
-      setUnreadMap(prev => ({ ...prev, [taskId]: 0 }));
+      setUnreadMap(prev => {
+        const newMap = { ...prev };
+        delete newMap[taskId]; 
+        return newMap;
+      });
 
       queryClient.invalidateQueries(["demandas"]);
-      queryClient.invalidateQueries(["unread_chat"]);
     } catch (error) {
       console.error("Erro ao marcar como lida:", error);
     }
