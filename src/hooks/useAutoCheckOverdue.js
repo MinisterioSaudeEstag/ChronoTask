@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { supabase } from "@/lib/supabaseClient";
+import { supabase } from "../lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
 
 export function useAutoCheckOverdue() {
@@ -10,12 +10,11 @@ export function useAutoCheckOverdue() {
       try {
         const nowISO = new Date().toISOString();
         
-        // Busca tarefas vencidas que NÃO estão concluídas nem atrasadas
         const { data: expiredTasks, error } = await supabase
           .from("tasks")
           .select("id, status, due_datetime")
           .lt("due_datetime", nowISO)
-          .not("status", "in", "(concluida,atrasada)"); // Sintaxe corrigida!
+          .in("status", ["nao_iniciado", "pendente"]);
 
         if (error) throw error;
         if (!expiredTasks || expiredTasks.length === 0) return;
@@ -27,7 +26,7 @@ export function useAutoCheckOverdue() {
           .in("id", ids);
 
         queryClient.invalidateQueries(["demandas"]);
-        queryClient.invalidateQueries(["equipe"]); // Atualiza também a home
+        queryClient.invalidateQueries(["equipe"]);
         
         console.log(`[AutoCheck] ${ids.length} tarefas movidas para atrasadas.`);
       } catch (err) {
@@ -37,7 +36,6 @@ export function useAutoCheckOverdue() {
 
     checkOverdueTasks();
 
-    // Verifica a cada 5 minutos (300.000 ms)
     const interval = setInterval(checkOverdueTasks, 300000);
     
     return () => clearInterval(interval);

@@ -16,8 +16,7 @@ export function useUnreadChat(demandas) {
 
       const { data, error } = await supabase
         .from("task_messages")
-        .select("task_id")
-        .eq("is_read", false)
+        .select("task_id, is_read")
         .neq("user_id", user.id)
         .in("task_id", taskIds);
 
@@ -25,7 +24,9 @@ export function useUnreadChat(demandas) {
 
       const counts = {};
       data.forEach(msg => {
-        counts[msg.task_id] = (counts[msg.task_id] || 0) + 1;
+        if (msg.is_read === false) {
+          counts[msg.task_id] = (counts[msg.task_id] || 0) + 1;
+        }
       });
       setUnreadMap(counts);
     }
@@ -34,8 +35,8 @@ export function useUnreadChat(demandas) {
 
     const channel = supabase
       .channel('unread_chat_global')
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'task_messages' }, () => {
-      fetchUnread(); 
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'task_messages' }, () => {
+      fetchUnread();
     })
     .subscribe();
 
@@ -43,16 +44,22 @@ export function useUnreadChat(demandas) {
   }, [user, JSON.stringify(demandas)]);
 
   async function markAsRead(taskId) {
-    const { error } = await supabase
-      .from("task_messages")
-      .update({ is_read: true })
-      .eq("task_id", taskId)
-      .neq("user_id", user.id)
-      .eq("is_read", false);
-    
-    if (!error) {
+    try {
+      const { error } = await supabase
+        .from("task_messages")
+        .update({ is_read: true })
+        .eq("task_id", taskId)
+        .neq("user_id", user.id)
+        .eq("is_read", false);
+      
+      if (error) throw error;
+
       setUnreadMap(prev => ({ ...prev, [taskId]: 0 }));
+
       queryClient.invalidateQueries(["demandas"]);
+      queryClient.invalidateQueries(["unread_chat"]);
+    } catch (error) {
+      console.error("Erro ao marcar como lida:", error);
     }
   }
 
