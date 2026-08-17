@@ -26,13 +26,13 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   const { unreadMap, markAsRead } = useUnreadChat(demandas);
 
-  const STATUS_OPTIONS = [
-    { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
-    { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
-    { value: "em_andamento", label: "Em Andamento", color: "bg-blue-100 text-blue-700" },
-    { value: "concluida", label: "Concluída", color: "bg-emerald-100 text-emerald-700" },
-    { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
-  ];
+const STATUS_OPTIONS = [
+  { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
+  { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
+  { value: "em_andamento", label: "Em Andamento", color: "bg-blue-100 text-blue-700" },
+  { value: "concluida", label: "Concluída", color: "bg-emerald-100 text-emerald-700" },
+  { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
+];
 
   async function logAction(taskId, field, oldVal, newVal, description) {
     try {

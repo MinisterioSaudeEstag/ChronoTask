@@ -7,17 +7,24 @@ export function useUnreadChat(demandas) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [unreadMap, setUnreadMap] = useState({});
+  
   const lastLocalUpdate = useRef(0);
+  const recentlyOpened = useRef(new Set());
 
   useEffect(() => {
     if (!user || !demandas || demandas.length === 0) return;
 
     async function fetchUnread() {
+      if (Date.now() - lastLocalUpdate.current < 5000) {
+        return;
+      }
+
       const taskIds = demandas.map(d => d.id);
 
       const { data, error } = await supabase
         .from("task_messages")
-        .select("task_id, is_read")
+        .select("task_id")
+        .eq("is_read", false)
         .neq("user_id", user.id)
         .in("task_id", taskIds);
 
@@ -25,26 +32,18 @@ export function useUnreadChat(demandas) {
 
       const counts = {};
       data.forEach(msg => {
-        if (msg.is_read === false) {
+        if (!recentlyOpened.current.has(msg.task_id)) {
           counts[msg.task_id] = (counts[msg.task_id] || 0) + 1;
         }
       });
-
-      const timeSinceLocalUpdate = Date.now() - lastLocalUpdate.current;
-      if (timeSinceLocalUpdate < 3000) {
-        console.log("Ignorando re-busca por atualização local recente.");
-        return;
-      }
 
       setUnreadMap(counts);
     }
 
     fetchUnread();
 
-    const tarefasIds = demandas.map(d => d.id).join(",");
-
     const channel = supabase
-      .channel('unread_chat_v2')
+      .channel('unread_chat_final')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'task_messages' }, (payload) => {
         if (payload.new?.user_id === user.id) return;
         fetchUnread();
@@ -57,6 +56,11 @@ export function useUnreadChat(demandas) {
   async function markAsRead(taskId) {
     lastLocalUpdate.current = Date.now();
     
+    recentlyOpened.current.add(taskId);
+    setTimeout(() => {
+      recentlyOpened.current.delete(taskId);
+    }, 8000); 
+
     try {
       const { error } = await supabase
         .from("task_messages")
@@ -69,7 +73,7 @@ export function useUnreadChat(demandas) {
 
       setUnreadMap(prev => {
         const newMap = { ...prev };
-        delete newMap[taskId]; 
+        delete newMap[taskId];
         return newMap;
       });
 
