@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
-import ChatModal from "../demanda/chatModal";
+import ChatModal from "../../components/demanda/chatModal";
 import { useUnreadChat } from "../../hooks/useUnreadChat";
 
 export default function HomeEquipe() {
