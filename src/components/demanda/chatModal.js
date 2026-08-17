@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { X, MessageCircle, Send, User, ShieldCheck } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
-import { useAuth } from "@/lib/authContext";
+import { supabase } from "../../lib/supabaseClient";
+import { useAuth } from "../../lib/authContext";
 import { toast } from "sonner";
 
 export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
@@ -15,26 +15,34 @@ export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
   const scrollRef = useRef(null);
 
   useEffect(() => {
-    if (!isOpen || !taskId) return;
+    if (!isOpen || !taskId || !user) return;
 
-    async function fetchMessages() {
+    async function loadChat() {
       setLoading(true);
       try {
+        await supabase
+          .from("task_messages")
+          .update({ is_read: true })
+          .eq("task_id", taskId)
+          .neq("user_id", user.id)
+          .eq("is_read", false);
+
         const { data, error } = await supabase
           .from("task_messages")
           .select("*")
           .eq("task_id", taskId)
           .order("created_at", { ascending: true });
+        
         if (error) throw error;
         setMessages(data || []);
       } catch (error) {
-        console.error("Erro ao buscar chat:", error);
+        console.error("Erro ao carregar chat:", error);
       } finally {
         setLoading(false);
       }
     }
 
-    fetchMessages();
+    loadChat();
 
     const channel = supabase
       .channel(`chat_task_${taskId}`)
@@ -45,11 +53,18 @@ export default function ChatModal({ taskId, taskDescricao, isOpen, onClose }) {
         filter: `task_id=eq.${taskId}`
       }, (payload) => {
         setMessages(prev => [...prev, payload.new]);
+        
+        if (payload.new.user_id !== user.id) {
+          supabase
+            .from("task_messages")
+            .update({ is_read: true })
+            .eq("id", payload.new.id);
+        }
       })
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [isOpen, taskId]);
+  }, [isOpen, taskId, user]);
 
   useEffect(() => {
     if (scrollRef.current) {

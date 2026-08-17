@@ -1,29 +1,25 @@
 import { useEffect, useState, useRef } from "react";
-import { supabase } from "../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "../lib/authContext";
+import { useAuth } from "@/lib/authContext";
 
 export function useUnreadChat(demandas) {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [unreadMap, setUnreadMap] = useState({});
-  
-  const lastLocalUpdate = useRef(0);
-  const recentlyOpened = useRef(new Set());
+
+  // Tarefas que o usuário acabou de abrir (ficam bloqueadas contra re-sincronização)
+  const tarefasVistas = useRef(new Set());
 
   useEffect(() => {
     if (!user || !demandas || demandas.length === 0) return;
 
     async function fetchUnread() {
-      if (Date.now() - lastLocalUpdate.current < 5000) {
-        return;
-      }
-
       const taskIds = demandas.map(d => d.id);
 
       const { data, error } = await supabase
         .from("task_messages")
-        .select("task_id")
+        .select("task_id, is_read")
         .eq("is_read", false)
         .neq("user_id", user.id)
         .in("task_id", taskIds);
@@ -32,7 +28,8 @@ export function useUnreadChat(demandas) {
 
       const counts = {};
       data.forEach(msg => {
-        if (!recentlyOpened.current.has(msg.task_id)) {
+        // FILTRO ANTI-FANTASMA: ignora tarefas que o usuário já abriu
+        if (!tarefasVistas.current.has(msg.task_id)) {
           counts[msg.task_id] = (counts[msg.task_id] || 0) + 1;
         }
       });
@@ -43,8 +40,9 @@ export function useUnreadChat(demandas) {
     fetchUnread();
 
     const channel = supabase
-      .channel('unread_chat_final')
+      .channel('unread_chat_impervious')
       .on('postgres_changes', { event: '*', schema: 'public', table: 'task_messages' }, (payload) => {
+        // Ignora mudanças vindas do próprio usuário
         if (payload.new?.user_id === user.id) return;
         fetchUnread();
       })
@@ -54,23 +52,19 @@ export function useUnreadChat(demandas) {
   }, [user, JSON.stringify(demandas)]);
 
   async function markAsRead(taskId) {
-    lastLocalUpdate.current = Date.now();
-    
-    recentlyOpened.current.add(taskId);
-    setTimeout(() => {
-      recentlyOpened.current.delete(taskId);
-    }, 8000); 
-
     try {
-      const { error } = await supabase
+      // 1. Marca no banco
+      await supabase
         .from("task_messages")
         .update({ is_read: true })
         .eq("task_id", taskId)
         .neq("user_id", user.id)
         .eq("is_read", false);
-      
-      if (error) throw error;
 
+      // 2. CORREÇÃO NUCLEAR: Adiciona a tarefa à lista de "vistas permanentemente"
+      tarefasVistas.current.add(taskId);
+
+      // 3. Remove do mapa IMEDIATAMENTE (sem esperar o banco)
       setUnreadMap(prev => {
         const newMap = { ...prev };
         delete newMap[taskId];
