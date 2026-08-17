@@ -68,14 +68,14 @@ export default function HomeEquipe() {
       {selectedEmployee && (
         <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="relative bg-white dark:bg-slate-900 w-full max-w-6xl max-h-[90vh] rounded-xl shadow-2xl overflow-hidden flex flex-col">
-            
+
             <div className="px-6 py-4 border-b border-border/60 flex justify-between items-center bg-primary text-white shrink-0">
               <div className="flex items-center gap-3">
                 <User className="w-5 h-5" />
                 <h3 className="font-bold text-black">Atividades de {selectedEmployee.full_name}</h3>
               </div>
-              <button 
-                onClick={() => setSelectedEmployee(null)} 
+              <button
+                onClick={() => setSelectedEmployee(null)}
                 className="z-50 bg-white text-primary text-black hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center"
                 aria-label="Fechar modal"
                 type="button"
@@ -179,14 +179,32 @@ export default function HomeEquipe() {
                           )}
                         </td>
                         <td className="px-4 py-4 align-top">
-                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${
-                            task.status === 'concluida' ? 'bg-emerald-100 text-emerald-700' :
-                            task.status === 'em_andamento' ? 'bg-blue-100 text-blue-700' :
-                            task.status === 'atrasada' ? 'bg-red-100 text-red-700' :
-                            task.status === 'nao_iniciado' ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
+                          <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${task.status === 'concluida' ? 'bg-emerald-100 text-emerald-700' :
+                              task.status === 'em_andamento' ? 'bg-blue-100 text-blue-700' :
+                                task.status === 'atrasada' ? 'bg-red-100 text-red-700' :
+                                  task.status === 'nao_iniciado' ? 'bg-slate-200 text-slate-700' : 'bg-amber-100 text-amber-700'
+                            }`}>
                             {task.status.replace('_', ' ')}
                           </span>
+
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="relative h-8 px-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
+                            onClick={() => {
+                              openChatModal(item);
+                              markAsRead(item.id);
+                            }}
+                          >
+                            <MessageCircle className="w-3 h-3 mr-1" /> Chat
+
+                            {unreadMap[item.id] > 0 && (
+                              <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm animate-pulse">
+                                {unreadMap[item.id]}
+                              </span>
+                            )}
+                          </Button>
+
                         </td>
                       </tr>
                     ))}
