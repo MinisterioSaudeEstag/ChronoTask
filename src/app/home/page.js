@@ -3,12 +3,20 @@ import React, { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabaseClient";
 import { Card, CardContent } from "@/components/ui/card";
-import { Users, User, ExternalLink, Hourglass, X, CheckCircle2, Calendar } from "lucide-react";
+import { 
+  Users, User, ExternalLink, Hourglass, X, CheckCircle2, 
+  Calendar, MessageCircle 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from 'sonner';
+import ChatModal from "../demanda/chatModal";
+import { useUnreadChat } from "../../hooks/useUnreadChat";
 
 export default function HomeEquipe() {
   const [selectedEmployee, setSelectedEmployee] = useState(null);
+  
+  const [chatModalOpen, setChatModalOpen] = useState(false);
+  const [selectedTaskForChat, setSelectedTaskForChat] = useState(null);
 
   const { data: equipe = [], isLoading: loadingEquipe } = useQuery({
     queryKey: ["equipe_list"],
@@ -31,6 +39,8 @@ export default function HomeEquipe() {
     },
     enabled: !!selectedEmployee,
   });
+
+  const { unreadMap } = useUnreadChat(tasks);
 
   if (loadingEquipe) return <div className="flex justify-center items-center h-screen text-slate-900 dark:text-white">Carregando equipe...</div>;
 
@@ -76,11 +86,11 @@ export default function HomeEquipe() {
               </div>
               <button
                 onClick={() => setSelectedEmployee(null)}
-                className="z-50 bg-white text-primary text-black hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center"
+                className="z-50 bg-white text-primary hover:bg-slate-200 p-2 rounded-full transition-colors shadow-lg flex items-center justify-center"
                 aria-label="Fechar modal"
                 type="button"
               >
-                <X className="w-5 h-5 font-bold" strokeWidth={3} />
+                <X className="w-5 h-5 font-bold text-black" strokeWidth={3} />
               </button>
             </div>
 
@@ -100,6 +110,7 @@ export default function HomeEquipe() {
                       <th className="px-4 py-4">Processo</th>
                       <th className="px-4 py-4">Convênio / TED</th>
                       <th className="px-4 py-4">Status</th>
+                      <th className="px-4 py-4 text-center">Chat</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-border/60">
@@ -131,7 +142,6 @@ export default function HomeEquipe() {
                             <span className="text-amber-600 text-sm font-medium">A definir</span>
                           )}
                         </td>
-
                         <td className="px-4 py-4 align-top">
                           {task.completed_at ? (
                             <div className="flex items-start gap-2">
@@ -155,7 +165,6 @@ export default function HomeEquipe() {
                             </div>
                           )}
                         </td>
-
                         <td className="px-4 py-4 align-top">
                           {task.processo ? (
                             <button onClick={() => { navigator.clipboard.writeText(task.processo); toast.success("Copiado!"); }} className="text-primary flex items-center gap-1 hover:underline font-medium text-sm">
@@ -186,25 +195,25 @@ export default function HomeEquipe() {
                             }`}>
                             {task.status.replace('_', ' ')}
                           </span>
-
+                        </td>
+                        <td className="px-4 py-4 align-top text-center">
                           <Button
                             variant="ghost"
                             size="sm"
                             className="relative h-8 px-2 bg-blue-500/10 text-blue-600 hover:bg-blue-500 hover:text-white transition-all cursor-pointer"
                             onClick={() => {
-                              openChatModal(item);
-                              markAsRead(item.id);
+                              setSelectedTaskForChat(task);
+                              setChatModalOpen(true);
                             }}
                           >
                             <MessageCircle className="w-3 h-3 mr-1" /> Chat
-
-                            {unreadMap[item.id] > 0 && (
+                            
+                            {unreadMap[task.id] > 0 && (
                               <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white shadow-sm animate-pulse">
-                                {unreadMap[item.id]}
+                                {unreadMap[task.id]}
                               </span>
                             )}
                           </Button>
-
                         </td>
                       </tr>
                     ))}
@@ -215,6 +224,13 @@ export default function HomeEquipe() {
           </div>
         </div>
       )}
+
+      <ChatModal
+        taskId={selectedTaskForChat?.id}
+        taskDescricao={selectedTaskForChat?.descricao}
+        isOpen={chatModalOpen}
+        onClose={() => setChatModalOpen(false)}
+      />
     </div>
   );
 }
