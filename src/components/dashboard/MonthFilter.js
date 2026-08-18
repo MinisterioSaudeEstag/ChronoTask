@@ -25,8 +25,8 @@ export default function MonthFilter({ selectedMonth, setSelectedMonth }) {
               onClick={() => setSelectedMonth(m.value)}
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
                 selectedMonth === m.value
-                  ? 'bg-primary text-white shadow-md'
-                  : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-300 hover:bg-slate-200'
+                  ? 'bg-primary text-black shadow-md'
+                  : 'dark:bg-slate-800 text-black dark:text-slate-300'
               }`}
             >
               {m.label}
