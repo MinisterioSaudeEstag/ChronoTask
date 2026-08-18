@@ -14,10 +14,11 @@ export default function MonthFilter({ selectedMonth, setSelectedMonth }) {
   return (
     <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
       <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wider mr-2 shrink-0">
+        <span className="text-[11px] font-bold uppercase tracking-wider mr-2 shrink-0 text-black">
           📅 Mês de Atribuição:
         </span>
         <div className="flex items-center gap-1">
+          {/* text black */}
           {months.map((m) => (
             <button
               key={m.value}
@@ -25,7 +26,7 @@ export default function MonthFilter({ selectedMonth, setSelectedMonth }) {
               className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
                 selectedMonth === m.value
                   ? 'bg-primary text-white shadow-md'
-                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-300 hover:bg-slate-200'
               }`}
             >
               {m.label}
