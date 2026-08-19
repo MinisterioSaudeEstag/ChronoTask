@@ -2,10 +2,10 @@
 import React, { useState } from "react";
 import { X, MessageCircle, MessageSquare, Calendar, Clock, User, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import ChatModal from "../../components/demanda/chatModal";
-import ObservationModal from "../../components/demanda/observationModal";
+import ChatModal from "@/components/demanda/chatModal";
+import ObservationModal from "@/components/demanda/observationModal";
 
-export default function TaskDetailsModal({ task, isOpen, onClose }) {
+export default function TasksDetailsModal({ task, isOpen, onClose }) {
   const [chatOpen, setChatOpen] = useState(false);
   const [obsOpen, setObsOpen] = useState(false);
 
@@ -41,13 +41,13 @@ export default function TaskDetailsModal({ task, isOpen, onClose }) {
                 <p className="text-sm text-slate-500 mt-1">Produto: <span className="font-medium text-slate-700 dark:text-slate-300">{task.produto}</span></p>
               </div>
               <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase border ${statusColors[task.status] || 'bg-slate-100 text-slate-700'}`}>
-                {task.status.replace('_', ' ')}
+                {task.status ? task.status.replace('_', ' ') : 'indefinido'}
               </span>
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <InfoCard icon={<User className="w-4 h-4" />} label="Funcionário" value={task.funcionario_nome} />
-              <InfoCard icon={<Calendar className="w-4 h-4" />} label="Atribuído em" value={new Date(task.created_at).toLocaleDateString('pt-BR')} />
+              <InfoCard icon={<Calendar className="w-4 h-4" />} label="Atribuído em" value={task.created_at ? new Date(task.created_at).toLocaleDateString('pt-BR') : '-'} />
               <InfoCard 
                 icon={<Clock className="w-4 h-4" />} 
                 label="Prazo Final" 
