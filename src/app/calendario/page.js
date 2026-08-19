@@ -8,7 +8,7 @@ import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "../../lib/supabaseClient";
 import { Layers, Activity, AlertCircle, Clock } from "lucide-react";
-import TaskDetailsModal from "./TaskDetailsModal";
+import TaskDetailsModal from "./TasksDetailsModal";
 import MonthFilter from "../../components/dashboard/MonthFilter";
 import FiltersPanel from "../../components/dashboard/FilterPanel";
 
