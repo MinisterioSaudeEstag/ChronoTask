@@ -1,6 +1,5 @@
 "use client";
-
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { Calendar, dateFnsLocalizer } from "react-big-calendar";
 import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -10,8 +9,6 @@ import { supabase } from "../../lib/supabaseClient";
 import { Layers, Activity, AlertCircle, Clock } from "lucide-react";
 import TaskDetailsModal from "./TasksDetailsModal";
 import MonthFilter from "../../components/dashboard/MonthFilter";
-import FiltersPanel from "../../components/dashboard/FilterPanel";
-
 
 const locales = { "pt-BR": ptBR };
 
@@ -34,13 +31,18 @@ const localizer = dateFnsLocalizer({
 });
 
 export default function CalendarioPage() {
+  const [isMounted, setIsMounted] = useState(false);
   const [view, setView] = useState("month");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
-
+  
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const { data: tarefas = [], isLoading } = useQuery({
     queryKey: ["calendario_tarefas"],
@@ -48,7 +50,7 @@ export default function CalendarioPage() {
       const { data } = await supabase.from("tasks").select("*");
       return data || [];
     },
-    enabled: typeof window !== "undefined",
+    enabled: isMounted,
     staleTime: 1000 * 60,
   });
 
@@ -113,10 +115,14 @@ export default function CalendarioPage() {
     concluidas: tarefasFiltradas.filter(t => t.status === 'concluida').length,
   };
 
+  if (!isMounted) {
+    return <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center text-slate-400">Carregando calendário...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-
+        
         <div className="flex items-center gap-3">
           <div className="p-3 bg-[#004785] rounded-xl shadow-sm">
             <Calendar className="w-6 h-6 text-white" />
@@ -135,19 +141,7 @@ export default function CalendarioPage() {
         </div>
 
         <MonthFilter selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex-1 min-w-[300px]">
-            <MonthFilter selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
-          </div>
-          <FiltersPanel
-            selectedStatuses={selectedStatuses}
-            setSelectedStatuses={setSelectedStatuses}
-            selectedProducts={selectedProducts}
-            setSelectedProducts={setSelectedProducts}
-          />
-        </div>
-
-
+        
         <div className="text-sm text-slate-600">
           Mostrando <strong>{tarefasFiltradas.length}</strong> de <strong>{tarefas.length}</strong> demandas
         </div>
