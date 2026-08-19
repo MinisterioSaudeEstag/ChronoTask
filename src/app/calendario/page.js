@@ -5,20 +5,23 @@ import { format, parse, startOfWeek, getDay } from "date-fns";
 import { ptBR } from "date-fns/locale";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import { useQuery } from "@tanstack/react-query";
-import { supabase } from "../../lib/supabaseClient";
+import { supabase } from "@/lib/supabaseClient";
 import { Layers, Activity, AlertCircle, Clock } from "lucide-react";
-import TaskDetailsModal from "./TasksDetailsModal";
-import MonthFilter from "../../components/dashboard/MonthFilter";
+import TasksDetailsModal from "./TasksDetailsModal";
+import MonthFilter from "@/components/dashboard/MonthFilter";
 
 const locales = { "pt-BR": ptBR };
 
+// Objeto de formatos explícito para evitar o erro de 'formats' undefined
 const formats = {
-  dayHeaderFormat: (date, culture, localizer) =>
-    localizer.format(date, "eeee, dd/MM/yyyy", culture),
-  agendaDateFormat: (date, culture, localizer) =>
-    localizer.format(date, "dd/MM/yyyy", culture),
-  weekdayFormat: (date, culture, localizer) =>
-    localizer.format(date, "eeee", culture),
+  dateFormat: 'dd',
+  dayFormat: 'dd/EE',
+  weekdayFormat: 'EEEE',
+  dayRangeHeaderFormat: ({ start, end }, culture, localizer) =>
+    `${localizer.format(start, 'dd MMM', culture)} - ${localizer.format(end, 'dd MMM', culture)}`,
+  agendaDateFormat: 'dd/MM/yyyy',
+  agendaTimeFormat: 'HH:mm',
+  dayHeaderFormat: 'dddd, dd/MM/yyyy',
 };
 
 const localizer = dateFnsLocalizer({
@@ -27,7 +30,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 0 }),
   locales,
-  formats,
 });
 
 export default function CalendarioPage() {
@@ -164,6 +166,7 @@ export default function CalendarioPage() {
               eventPropGetter={eventStyleGetter}
               onSelectEvent={(event) => setSelectedTask(event.task)}
               culture="pt-BR"
+              formats={formats}
               messages={{
                 next: "Próximo", previous: "Anterior", today: "Hoje",
                 month: "Mês", week: "Semana", day: "Dia", agenda: "Agenda",
@@ -176,7 +179,7 @@ export default function CalendarioPage() {
         )}
       </div>
 
-      <TaskDetailsModal
+      <TasksDetailsModal
         task={selectedTask}
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
