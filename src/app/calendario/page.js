@@ -23,7 +23,7 @@ export default function CalendarioPage() {
   const [view, setView] = useState("month");
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedTask, setSelectedTask] = useState(null);
-
+  
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
@@ -75,7 +75,7 @@ export default function CalendarioPage() {
     end: task.due_datetime ? new Date(task.due_datetime) : new Date(),
     color: statusConfig[task.status]?.color || "#64748b",
     status: task.status,
-    task: task,
+    task: task, 
   })), [tarefasFiltradas]);
 
   const eventStyleGetter = (event) => ({
@@ -102,7 +102,7 @@ export default function CalendarioPage() {
   return (
     <div className="min-h-screen bg-slate-50 p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-
+        
         <div className="flex items-center gap-3">
           <div className="p-3 bg-[#004785] rounded-xl shadow-sm">
             <Calendar className="w-6 h-6 text-white" />
@@ -121,21 +121,7 @@ export default function CalendarioPage() {
         </div>
 
         <MonthFilter selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
-
-        <div className="flex flex-wrap items-center gap-3">
-          <div className="flex-1 min-w-[300px]">
-            <MonthFilter selectedMonth={selectedMonth} setSelectedMonth={setSelectedMonth} />
-          </div>
-          
-          <FiltersPanel
-            selectedStatuses={selectedStatuses}
-            setSelectedStatuses={setSelectedStatuses}
-            selectedProducts={selectedProducts}
-            setSelectedProducts={setSelectedProducts}
-          />
-        </div>
-
-
+        
         <div className="text-sm text-slate-600">
           Mostrando <strong>{tarefasFiltradas.length}</strong> de <strong>{tarefas.length}</strong> demandas
         </div>
