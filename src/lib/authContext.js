@@ -9,9 +9,9 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  const ADMINS_LIST = ["Eliane Leal", "Maria Juliana", "Monalisa Aquino", "Matheus Nascimento"];
+  const ADMINS_LIST = ["Eliane Leal", "Maria Juliana", "Monalisa Aquino", "Matheus do Nascimento"];
 
-  const STAFF_LIST = ["Arthur Vinícius", "Ana Aparecida", "Giselly Soares", "Emilly Alves", "Maria Luna"];
+  const STAFF_LIST = ["Arthur Vinícius", "Ana Aparecida de Freitas Lima", "Giselly Soares", "Maria Luna", "Maria Angelita de Lucena"];
 
   useEffect(() => {
     const getSession = async () => {

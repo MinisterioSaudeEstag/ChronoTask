@@ -51,7 +51,7 @@ export default function PrivacidadePage() {
       </div>
 
       <div className="bg-slate-100 dark:bg-slate-800 p-6 rounded-xl text-center text-sm text-muted-foreground border border-border/60">
-        Este documento é para fins de organização interna da unidade DITRE/PE. <br/>
+        Este documento é para fins de organização interna das unidades DITRE/PE e COTRE/PE. <br/>
         Para dúvidas, entre em contato com a administração do sistema.
       </div>
     </div>
