@@ -5,12 +5,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient";
-import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2, HelpCircle } from "lucide-react";
+import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2, HelpCircle, Calendar, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/notifications/notificationBell";
 import { useAutoCheckOverdue } from "../../hooks/useAutoCheckOverdue";
-import { Calendar } from "lucide-react";
-import { Archive } from "lucide-react";
 
 export default function Header() {
   useAutoCheckOverdue();
@@ -18,14 +16,13 @@ export default function Header() {
   const pathname = usePathname();
   const { user } = useAuth();
 
+  const isAdmin = user?.role === "admin";
+
   if (pathname === "/") return null;
 
   async function handleLogout() {
     await supabase.auth.signOut();
     window.location.href = "/";
-
-    const { user } = useAuth();
-    const isAdmin = user?.role === "admin";
   }
 
   return (
@@ -45,39 +42,45 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-6 ml-8">
           <Link
             href="/dashboard"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/dashboard'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+            }`}
           >
             <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
 
           <Link
             href="/minhas-atividades"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/minhas-atividades'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/minhas-atividades'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+            }`}
           >
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
 
           <Link
             href="/home"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/home'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/home'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+            }`}
           >
             <Users className="w-4 h-4" /> Equipe
           </Link>
 
-          <Link href="/calendario" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/calendario'
-            ? 'text-primary font-bold'
-            : 'text-slate-400 hover:text-foreground'
-            }`}>
-
+          <Link
+            href="/calendario"
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/calendario'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+            }`}
+          >
             <Calendar className="w-4 h-4" /> Calendário
           </Link>
 
@@ -92,18 +95,22 @@ export default function Header() {
 
           <Link
             href="/ajuda"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/ajuda' ? 'text-primary font-bold' : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/ajuda'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+            }`}
           >
             <HelpCircle className="w-4 h-4" /> Ajuda
           </Link>
 
           <Link
             href="/relatorios"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/relatorios'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${
+              pathname === '/relatorios'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+            }`}
           >
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
