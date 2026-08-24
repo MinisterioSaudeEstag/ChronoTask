@@ -147,11 +147,6 @@ export default function CalendarioPage() {
           />
         </div>
 
-        <MonthFilter
-          selectedMonth={selectedMonth}
-          setSelectedMonth={setSelectedMonth}
-        />
-
         <div className="text-sm text-slate-600">
           Mostrando <strong>{tarefasFiltradas.length}</strong> de{" "}
           <strong>{tarefas.length}</strong> demandas
