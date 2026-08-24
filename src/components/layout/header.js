@@ -1,4 +1,5 @@
 "use client";
+
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -22,6 +23,9 @@ export default function Header() {
   async function handleLogout() {
     await supabase.auth.signOut();
     window.location.href = "/";
+
+    const { user } = useAuth();
+    const isAdmin = user?.role === "admin";
   }
 
   return (
