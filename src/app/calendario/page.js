@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 "use client";
 
 import React, { useState, useMemo } from "react";
@@ -12,6 +10,8 @@ import { supabase } from "@/lib/supabaseClient";
 import { Layers, Activity, AlertCircle, Clock, PlayCircle, CheckCircle2 } from "lucide-react";
 import TaskDetailsModal from "./TasksDetailsModal";
 import MonthFilter from "@/components/dashboard/MonthFilter";
+
+export const dynamic = 'force-dynamic';
 
 const locales = { "pt-BR": ptBR };
 const localizer = dateFnsLocalizer({
