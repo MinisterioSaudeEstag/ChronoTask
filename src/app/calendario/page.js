@@ -13,10 +13,14 @@ import MonthFilter from "@/components/dashboard/MonthFilter";
 
 export const dynamic = 'force-dynamic';
 
-const locales = { "pt-BR": ptBR };
+const locales = { 
+ 'pt-BR': ptBR,
+  'ptBR': ptBR,
+ };
+ 
 const localizer = dateFnsLocalizer({
   format, parse, getDay,
-  startOfWeek: () => startOfWeek(new Date(), { weekStartsOn: 0 }),
+  startOfWeek: (date) => startOfWeek(date, { weekStartsOn: 0 }),
   locales,
 });
 
