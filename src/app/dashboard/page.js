@@ -1,16 +1,18 @@
 "use client";
 import React, { useState, useMemo } from "react";
+import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../lib/authContext";
 import { supabase } from "../../lib/supabaseClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { ClipboardList, Clock, CheckCircle2, AlertTriangle, Users } from "lucide-react";
+import { ClipboardList, Clock, CheckCircle2, AlertTriangle, Users, Archive } from "lucide-react";
 import FuncionarioCard from "../../components/demanda/employeCard";
 import NovaDemandaDialog from "../../components/demanda/newDemandDialog";
 import DemandasRecentesTable from "../../components/demanda/recentDemandTable";
 import MonthFilter from "../../components/dashboard/MonthFilter";
 import FiltersPanel from "../../components/dashboard/FilterPanel";
+import { useArchiveTask } from "../../hooks/useArchiveTask";
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -20,6 +22,8 @@ export default function Dashboard() {
   const [selectedMonth, setSelectedMonth] = useState('all');
   const [selectedStatuses, setSelectedStatuses] = useState([]);
   const [selectedProducts, setSelectedProducts] = useState([]);
+
+  const { archiveTask } = useArchiveTask();
 
   const { data: equipe = [], isLoading: loadingEquipe } = useQuery({
     queryKey: ["equipe_dashboard"],
@@ -35,11 +39,17 @@ export default function Dashboard() {
   const { data: demandas = [], isLoading: loadingDemandas } = useQuery({
     queryKey: ["demandas"],
     queryFn: async () => {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from("tasks")
         .select("*")
+        .eq("archived", false)
         .order("created_at", { ascending: false });
-      return data || [];
+      
+      if (error) {
+        console.error("Erro ao buscar demandas:", error);
+        return [];
+      }
+      return data;
     },
   });
 
@@ -87,6 +97,9 @@ export default function Dashboard() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8 space-y-6">
         <Skeleton className="h-10 w-64" />
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+          {Array(5).fill(0).map((_, i) => <Skeleton key={i} className="h-24 rounded-xl" />)}
+        </div>
       </div>
     );
   }
@@ -163,6 +176,23 @@ export default function Dashboard() {
       )}
 
       <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-lg font-semibold flex items-center gap-2 text-slate-900 dark:text-white">
+            <ClipboardList className="w-5 h-5 text-primary" />
+            Demandas Recentes
+          </h2>
+          
+          {isAdmin && (
+            <Link 
+              href="/demandas-arquivadas"
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 rounded-lg text-sm font-medium hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+            >
+              <Archive className="w-4 h-4" />
+              Ver Arquivadas
+            </Link>
+          )}
+        </div>
+
         <DemandasRecentesTable 
           demandas={myDemandas} 
           isAdmin={isAdmin} 

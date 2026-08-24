@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/notifications/notificationBell";
 import { useAutoCheckOverdue } from "../../hooks/useAutoCheckOverdue";
 import { Calendar } from "lucide-react";
+import { Archive } from "lucide-react";
 
 export default function Header() {
   useAutoCheckOverdue();
@@ -69,12 +70,21 @@ export default function Header() {
           </Link>
 
           <Link href="/calendario" className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/calendario'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}>
+            ? 'text-primary font-bold'
+            : 'text-slate-400 hover:text-foreground'
+            }`}>
 
             <Calendar className="w-4 h-4" /> Calendário
           </Link>
+
+          {isAdmin && (
+            <Link
+              href="/demandas-arquivadas"
+              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-[#004785] transition-colors"
+            >
+              <Archive className="w-4 h-4" /> Arquivadas
+            </Link>
+          )}
 
           <Link
             href="/ajuda"

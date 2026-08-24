@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from "react";
-import { ExternalLink, Clock, Loader2, MessageSquare, Trash2, MessageCircle } from "lucide-react";
+import { ExternalLink, Clock, Loader2, MessageSquare, Trash2, MessageCircle, Archive } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/lib/supabaseClient";
 import { useQueryClient } from "@tanstack/react-query";
@@ -10,7 +10,7 @@ import { toast } from 'sonner';
 import ObservationModal from "../demanda/observationModal";
 import ChatModal from "../demanda/chatModal";
 import { useUnreadChat } from "../../hooks/useUnreadChat";
-
+import { useArchiveTask } from "../../hooks/useArchiveTask";
 
 export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const queryClient = useQueryClient();
@@ -25,14 +25,15 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const [selectedTaskForChat, setSelectedTaskForChat] = useState(null);
 
   const { unreadMap, markAsRead } = useUnreadChat(demandas);
+  const { archiveTask } = useArchiveTask();
 
-const STATUS_OPTIONS = [
-  { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
-  { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
-  { value: "em_andamento", label: "Em Andamento", color: "bg-blue-100 text-blue-700" },
-  { value: "concluida", label: "Concluída", color: "bg-emerald-100 text-emerald-700" },
-  { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
-];
+  const STATUS_OPTIONS = [
+    { value: "nao_iniciado", label: "Não Iniciada", color: "bg-slate-200 text-slate-700" },
+    { value: "pendente", label: "Pendente", color: "bg-amber-100 text-amber-700" },
+    { value: "em_andamento", label: "Em Andamento", color: "bg-blue-100 text-blue-700" },
+    { value: "concluida", label: "Concluída", color: "bg-emerald-100 text-emerald-700" },
+    { value: "atrasada", label: "Atrasada", color: "bg-red-100 text-red-700" },
+  ];
 
   async function logAction(taskId, field, oldVal, newVal, description) {
     try {
@@ -264,6 +265,20 @@ const STATUS_OPTIONS = [
                           onClick={() => onEdit(item)}
                         >
                           Editar
+                        </Button>
+
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 px-2 cursor-pointer text-slate-700 hover:text-amber-600 transition-colors"
+                          title="Arquivar demanda"
+                          onClick={() => {
+                            if (window.confirm(`Arquivar a demanda "${item.descricao}"?\n\nA demanda sumirá da tela principal, mas pode ser restaurada depois em "Arquivadas".`)) {
+                              archiveTask(item.id);
+                            }
+                          }}
+                        >
+                          <Archive className="w-4 h-4" />
                         </Button>
 
                         <Button
