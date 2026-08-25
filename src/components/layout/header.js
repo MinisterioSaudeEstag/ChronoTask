@@ -1,5 +1,4 @@
 "use client";
-
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -15,7 +14,6 @@ export default function Header() {
 
   const pathname = usePathname();
   const { user } = useAuth();
-
   const isAdmin = user?.role === "admin";
 
   if (pathname === "/") return null;
@@ -42,44 +40,40 @@ export default function Header() {
         <nav className="hidden md:flex items-center gap-6 ml-8">
           <Link
             href="/dashboard"
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/dashboard'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard'
+              ? 'text-primary font-bold'
+              : 'text-slate-400 hover:text-foreground'
+              }`}
           >
             <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
 
           <Link
             href="/minhas-atividades"
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/minhas-atividades'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/minhas-atividades'
+              ? 'text-primary font-bold'
+              : 'text-slate-400 hover:text-foreground'
+              }`}
           >
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
 
           <Link
             href="/home"
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/home'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/home'
+              ? 'text-primary font-bold'
+              : 'text-slate-400 hover:text-foreground'
+              }`}
           >
             <Users className="w-4 h-4" /> Equipe
           </Link>
 
           <Link
             href="/calendario"
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/calendario'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/calendario'
+              ? 'text-primary font-bold'
+              : 'text-slate-400 hover:text-foreground'
+              }`}
           >
             <Calendar className="w-4 h-4" /> Calendário
           </Link>
@@ -87,7 +81,10 @@ export default function Header() {
           {isAdmin && (
             <Link
               href="/demandas-arquivadas"
-              className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-[#004785] transition-colors"
+              className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/demandas-arquivadas'
+                ? 'text-primary font-bold'
+                : 'text-slate-400 hover:text-foreground'
+                }`}
             >
               <Archive className="w-4 h-4" /> Arquivadas
             </Link>
@@ -95,22 +92,18 @@ export default function Header() {
 
           <Link
             href="/ajuda"
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/ajuda'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/ajuda' ? 'text-primary font-bold' : 'text-slate-400 hover:text-foreground'
+              }`}
           >
             <HelpCircle className="w-4 h-4" /> Ajuda
           </Link>
 
           <Link
             href="/relatorios"
-            className={`flex items-center gap-2 text-sm transition-colors ${
-              pathname === '/relatorios'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-            }`}
+            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/relatorios'
+              ? 'text-primary font-bold'
+              : 'text-slate-400 hover:text-foreground'
+              }`}
           >
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
