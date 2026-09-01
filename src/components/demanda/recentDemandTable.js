@@ -18,7 +18,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
   
-  // Estado para filtro simplificado
   const [simplifiedView, setSimplifiedView] = useState(false);
 
   const [obsModalOpen, setObsModalOpen] = useState(false);
@@ -65,47 +64,21 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     setChatModalOpen(true);
   }
 
-  // Nova função para finalizar rapidamente pelo badge
-  async function handleQuickComplete(taskId, currentStatus) {
-    if (currentStatus === 'concluida') {
-      // Se já está finalizada, volta para "em_andamento"
-      setUpdatingId(taskId);
-      try {
-        await supabase.from("tasks").update({ 
-          status: "em_andamento",
-          completed_at: null 
-        }).eq("id", taskId);
-        
-        toast.success("Demanda reaberta!");
-        queryClient.invalidateQueries(["demandas"]);
-      } catch (error) {
-        toast.error("Erro: " + error.message);
-      } finally {
-        setUpdatingId(null);
-      }
-    } else {
-      // Marca como finalizada
-      setUpdatingId(taskId);
-      try {
-        await supabase.from("tasks").update({ 
-          status: "concluida",
-          completed_at: new Date().toISOString() 
-        }).eq("id", taskId);
-        
-        // Abre o modal de observação para registrar a devolutiva
-        const taskCompleta = demandas.find(d => d.id === taskId);
-        if (taskCompleta) {
-          setSelectedTaskForObs(taskCompleta);
-          setObsModalOpen(true);
-        }
-        
-        toast.success("Demanda finalizada!");
-        queryClient.invalidateQueries(["demandas"]);
-      } catch (error) {
-        toast.error("Erro: " + error.message);
-      } finally {
-        setUpdatingId(null);
-      }
+  async function handleQuickComplete(taskId, isFinalizado) {
+    setUpdatingId(taskId);
+    try {
+      const novoEstado = !isFinalizado;
+      
+      await supabase.from("tasks").update({ 
+        is_finalizado: novoEstado 
+      }).eq("id", taskId);
+      
+      toast.success(novoEstado ? "Demanda finalizada!" : "Demanda reaberta!");
+      queryClient.invalidateQueries(["demandas"]);
+    } catch (error) {
+      toast.error("Erro: " + error.message);
+    } finally {
+      setUpdatingId(null);
     }
   }
 
@@ -305,18 +278,17 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
                     {isAdmin && (
                       <>
-                        {/* NOVO BADGE SIMPLIFICADO: Aberto / Finalizado */}
                         <button
-                          onClick={() => handleQuickComplete(item.id, item.status)}
+                          onClick={() => handleQuickComplete(item.id, item.is_finalizado)}
                           disabled={updatingId === item.id}
                           className={`h-7 px-2 rounded-full text-[10px] font-bold uppercase border transition-all cursor-pointer ${
-                            item.status === 'concluida'
+                            item.is_finalizado
                               ? 'bg-emerald-50 text-emerald-700 border-emerald-200 hover:bg-emerald-100'
                               : 'bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-100'
                           }`}
                           title="Clique para alternar entre Aberto e Finalizado"
                         >
-                          {item.status === 'concluida' ? '✓ Finalizado' : '◷ Aberto'}
+                          {item.is_finalizado ? '✓ Finalizado' : '◷ Aberto'}
                         </button>
                         
                         <Button
@@ -328,7 +300,6 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           Editar
                         </Button>
 
-                        {/* BOTÃO ARQUIVAR */}
                         <Button
                           variant="ghost"
                           size="sm"
