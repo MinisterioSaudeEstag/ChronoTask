@@ -69,9 +69,11 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     try {
       const novoEstado = !isFinalizado;
       
-      await supabase.from("tasks").update({ 
+      const { error } = await supabase.from("tasks").update({ 
         is_finalizado: novoEstado 
       }).eq("id", taskId);
+      
+      if (error) throw error;
       
       toast.success(novoEstado ? "Demanda finalizada!" : "Demanda reaberta!");
       queryClient.invalidateQueries(["demandas"]);
