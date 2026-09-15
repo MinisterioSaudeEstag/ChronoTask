@@ -20,7 +20,7 @@ export default function RegisterPage() {
 
     const isInstitutional = email.endsWith("@saude.gov.br") || email.endsWith("@outlook.com");
     if (!isInstitutional) {
-      alert("Erro: Apenas e-mails institucionais (@saude.gov.br ou @outlook.com) são permitidos.");
+      alert("Erro: Apenas e-mails institucionais @saude.gov.br são permitidos.");
       setLoading(false);
       return;
     }
@@ -49,7 +49,7 @@ export default function RegisterPage() {
       if (profileError) {
         alert("Erro ao criar perfil: " + profileError.message);
       } else {
-        alert("Conta criada com sucesso! Por favor, verifique seu e-mail.");
+        alert("Conta criada com sucesso!");
         router.push("/login");
       }
     }

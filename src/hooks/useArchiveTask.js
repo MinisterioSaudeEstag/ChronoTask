@@ -18,7 +18,6 @@ export function useArchiveTask() {
       if (error) throw error;
 
       toast.success("Demanda arquivada com sucesso!");
-      // Atualiza todas as queries que dependem das tarefas
       queryClient.invalidateQueries(["demandas"]);
       queryClient.invalidateQueries(["equipe"]);
       queryClient.invalidateQueries(["tarefas_arquivadas"]);

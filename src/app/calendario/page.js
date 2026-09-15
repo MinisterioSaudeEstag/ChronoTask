@@ -12,7 +12,6 @@ import { Calendar as CalendarIcon, PlayCircle, CheckCircle2 } from "lucide-react
 import TaskDetailsModal from "./TasksDetailsModal";
 import MonthFilter from "@/components/dashboard/MonthFilter";
 
-// Importa o Calendar dinamicamente sem SSR para evitar o erro de prerender na Vercel
 const Calendar = dynamicImport(
   () => import("react-big-calendar").then((mod) => mod.Calendar),
   { ssr: false }
