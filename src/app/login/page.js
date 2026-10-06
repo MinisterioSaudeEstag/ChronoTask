@@ -6,8 +6,6 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Lock, Mail, LogIn } from "lucide-react";
 import Link from "next/link";
-import HeaderWrapper from "../../components/layout/headerWrapper";
-import Header from "@/components/layout/header";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -45,10 +43,6 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-foreground">Bem-vindo ao ChronoTask</h1>
           <p className="text-muted-foreground text-sm mt-2">Entre com seu e-mail institucional</p>
         </div>
-
-        <header>
-          <HeaderWrapper></HeaderWrapper>
-        </header>
 
         <div className="space-y-6">
 
