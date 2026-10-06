@@ -78,7 +78,7 @@ export default function LandingPage() {
 
             <div className="relative z-10">
               <img
-                src="mockup-dashboard.png"
+                src="dashboard-chronotask.jpeg"
                 alt="Mockup do dashboard do ChronoTask"
                 className="w-full rounded-xl shadow-lg"
               />
