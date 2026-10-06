@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Lock, Mail, LogIn } from "lucide-react";
 import Link from "next/link";
+import HeaderWrapper from "../../components/layout/headerWrapper";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -93,6 +94,8 @@ export default function LoginPage() {
             </Button>
           </form>
         </div>
+
+        <HeaderWrapper></HeaderWrapper>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           Não tem conta?{" "}
