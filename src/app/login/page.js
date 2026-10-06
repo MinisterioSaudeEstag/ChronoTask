@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Lock, Mail, LogIn } from "lucide-react";
 import Link from "next/link";
 import HeaderWrapper from "../../components/layout/headerWrapper";
+import Header from "@/components/layout/header";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -34,7 +35,7 @@ export default function LoginPage() {
     }
   }
 
-  return (
+  return (    
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
       <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-border/60 p-8">
         <div className="text-center mb-8">
@@ -44,6 +45,10 @@ export default function LoginPage() {
           <h1 className="text-2xl font-bold text-foreground">Bem-vindo ao ChronoTask</h1>
           <p className="text-muted-foreground text-sm mt-2">Entre com seu e-mail institucional</p>
         </div>
+
+        <header>
+          <HeaderWrapper></HeaderWrapper>
+        </header>
 
         <div className="space-y-6">
 
@@ -94,8 +99,6 @@ export default function LoginPage() {
             </Button>
           </form>
         </div>
-
-        <HeaderWrapper></HeaderWrapper>
 
         <div className="mt-6 text-center text-sm text-muted-foreground">
           Não tem conta?{" "}
