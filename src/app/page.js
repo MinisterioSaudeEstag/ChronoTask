@@ -1,11 +1,11 @@
 import React from "react";
 import Link from "next/link";
-import { 
-  ArrowRight, 
-  CheckCircle, 
-  Clock, 
+import {
+  ArrowRight,
+  CheckCircle,
+  Clock,
   FileText,
-  Users, 
+  Users,
   ClipboardList,
   ChevronRight,
   LineChart,
@@ -21,35 +21,29 @@ import { Button } from "@/components/ui/button";
 export default function LandingPage() {
   return (
     <div className="min-h-screen bg-white text-slate-900 font-sans">
-      
-      <header className="bg-white sticky top-0 z-50 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-20 flex items-center justify-between">
-          
-          <div className="flex items-center gap-12">
+
+      <header className="border-b border-border/60 bg-background/95 backdrop-blur supports-backdrop-blur sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <CalendarCheck className="w-8 h-8 text-[#004785]" />
-              <span className="font-bold text-2xl tracking-tight text-[#004785]">
-                ChronoTask
+              <div className="w-10 h-10 bg-[#004785] rounded-full flex items-center justify-center text-white font-bold text-xs">
+                <img src="logo-chronotask.jpeg" alt="logo-chronotask"></img>
+              </div>
+              <span className="font-bold text-xl tracking-tight text-[#004785]">
+                Chrono<span className="text-slate-500">Task</span>
               </span>
             </div>
-            
-            <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-slate-600">
-              <Link href="#" className="text-[#004785] border-b-2 border-[#004785] pb-1">Início</Link>
-              <Link href="#" className="hover:text-[#004785] transition-colors">Recursos</Link>
-              <Link href="#" className="hover:text-[#004785] transition-colors">Como funciona</Link>
-              <Link href="#" className="hover:text-[#004785] transition-colors">Suporte</Link>
-            </nav>
           </div>
-          
+
           <div className="flex items-center gap-4">
             <Link href="/login">
-              <Button variant="ghost" className="text-sm font-medium text-slate-600 hover:text-[#004785]">
+              <Button variant="ghost" className="text-sm font-medium">
                 Entrar
               </Button>
             </Link>
             <Link href="/login">
-              <Button className="bg-[#004785] hover:bg-[#003566] text-white px-5 rounded-md gap-2">
-                Acessar Sistema <ArrowRight className="w-4 h-4" />
+              <Button className="bg-[#004785] hover:bg-[#003566] text-white px-5">
+                Acessar Sistema
               </Button>
             </Link>
           </div>
@@ -61,15 +55,15 @@ export default function LandingPage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 grid lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8 text-center lg:text-left z-10">
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 leading-[1.1]">
-                Organize suas demandas.<br/>
-                Acompanhe seus prazos.<br/>
+                Organize suas demandas.<br />
+                Acompanhe seus prazos.<br />
                 Entregue com <span className="text-[#004785]">controle.</span>
               </h1>
-              
+
               <p className="text-lg text-slate-600 max-w-xl mx-auto lg:mx-0 leading-relaxed">
                 O ChronoTask centraliza as demandas da equipe, facilita a distribuição das atividades e permite acompanhar prazos, responsáveis e andamento em um único lugar.
               </p>
-              
+
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <Link href="/login">
                   <Button size="lg" className="bg-[#004785] hover:bg-[#003566] text-white px-8 rounded-md gap-2">
@@ -83,7 +77,7 @@ export default function LandingPage() {
             </div>
 
             <div className="relative z-10">
-              <img 
+              <img
                 src="mockup-dashboard.png"
                 alt="Mockup do dashboard do ChronoTask"
                 className="w-full rounded-xl shadow-lg"
@@ -98,22 +92,22 @@ export default function LandingPage() {
               Tudo sob controle em um único lugar
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<ClipboardList className="w-6 h-6 text-[#004785]" />}
                 title="Demandas"
                 description="Organize todas as atividades da sua equipe."
               />
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<Users className="w-6 h-6 text-[#004785]" />}
                 title="Equipe"
                 description="Distribua responsabilidades de forma simples."
               />
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<Clock className="w-6 h-6 text-[#004785]" />}
                 title="Prazos"
                 description="Acompanhe vencimentos e evite atrasos."
               />
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<CheckCircle className="w-6 h-6 text-[#004785]" />}
                 title="Resultados"
                 description="Monitore conclusões e garanta entregas."
@@ -130,16 +124,16 @@ export default function LandingPage() {
             <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 md:gap-2">
               <StepItem number="01" title="Administrador atribui" desc="Define as demandas e responsáveis." />
               <ChevronRight className="hidden md:block w-5 h-5 text-slate-300 shrink-0" />
-              
+
               <StepItem number="02" title="Funcionário recebe" desc="Visualiza suas atividades." />
               <ChevronRight className="hidden md:block w-5 h-5 text-slate-300 shrink-0" />
-              
+
               <StepItem number="03" title="Atividade é executada" desc="Com o acompanhamento da equipe." />
               <ChevronRight className="hidden md:block w-5 h-5 text-slate-300 shrink-0" />
-              
+
               <StepItem number="04" title="Entrega é registrada" desc="Atualiza o status da demanda." />
               <ChevronRight className="hidden md:block w-5 h-5 text-slate-300 shrink-0" />
-              
+
               <StepItem number="05" title="Gestão acompanha" desc="Acessa relatórios e resultados." />
             </div>
           </div>
@@ -151,22 +145,22 @@ export default function LandingPage() {
               Recursos principais
             </h2>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<Users className="w-6 h-6 text-[#004785]" />}
                 title="Gestão de equipe"
                 description="Distribua demandas e acompanhe responsáveis."
               />
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<FileText className="w-6 h-6 text-[#004785]" />}
                 title="Controle de processos"
                 description="Vincule demandas aos respectivos processos."
               />
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<Clock className="w-6 h-6 text-[#004785]" />}
                 title="Controle de prazos"
                 description="Acompanhe início, término e tempo estimado."
               />
-              <HorizontalFeatureCard 
+              <HorizontalFeatureCard
                 icon={<LineChart className="w-6 h-6 text-[#004785]" />}
                 title="Acompanhamento em tempo real"
                 description="Veja o status de cada demanda instantaneamente."
