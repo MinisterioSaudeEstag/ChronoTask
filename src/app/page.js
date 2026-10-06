@@ -21,7 +21,7 @@ export default function LandingPage() {
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
               <div className="w-10 h-10 bg-[#004785] rounded-full flex items-center justify-center text-white font-bold text-xs">
-                MS
+                <img src="logo-chronotask.jpeg" alt="logo-chronotask"></img>
               </div>
               <span className="font-bold text-xl tracking-tight text-[#004785]">
                 Chrono<span className="text-slate-500">Task</span>
