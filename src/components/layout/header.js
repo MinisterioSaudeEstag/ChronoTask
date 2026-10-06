@@ -4,7 +4,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/lib/authContext";
 import { supabase } from "@/lib/supabaseClient";
-import { Moon, Sun, User, LogOut, LayoutDashboard, FileText, Users, CheckCircle2, HelpCircle, Calendar, Archive } from "lucide-react";
+import { 
+  User, 
+  LogOut, 
+  LayoutDashboard, 
+  FileText, 
+  Users, 
+  CheckCircle2, 
+  HelpCircle, 
+  Calendar, 
+  Archive 
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import NotificationBell from "@/components/notifications/notificationBell";
 import { useAutoCheckOverdue } from "../../hooks/useAutoCheckOverdue";
@@ -23,57 +33,53 @@ export default function Header() {
     window.location.href = "/";
   }
 
+  const linkBaseStyle = "flex items-center gap-2 text-sm transition-colors";
+  const linkActiveStyle = "text-slate-900 font-bold";
+  const linkInactiveStyle = "text-slate-500 font-medium hover:text-slate-800";
+
   return (
-    <header className="h-16 border-b border-slate-200 dark:border-white/10 bg-white dark:bg-darkBg text-slate-900 dark:text-white px-6 flex items-center justify-between transition-colors duration-300">
-      <div className="flex items-center gap-6">
-        <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <img src="/logo-sus.png" alt="SUS" className="h-8 w-auto" />
-          </div>
-          <div className="h-8 w-[1px] bg-white/10 mx-2" />
-          <div className="flex flex-col">
-            <span className="font-bold text-lg leading-none">ChronoTask</span>
-            <span className="text-[9px] text-slate-400 uppercase font-medium tracking-wider">COTRE/PE | DITRE/PE</span>
+    <header className="h-16 border-b border-slate-200 bg-white text-slate-900 px-6 flex items-center justify-between transition-colors duration-300 sticky top-0 z-40">
+      
+      <div className="flex items-center gap-8">
+        
+        <Link href="/dashboard" className="flex items-center gap-3 group">
+          <img src="/logo-sus.png" alt="SUS" className="h-8 w-auto" />
+          <div className="h-8 w-[1px] bg-slate-300 mx-1" />
+          <div className="flex flex-col justify-center">
+            <span className="font-extrabold text-xl leading-none text-[#004785] tracking-tight group-hover:text-blue-700 transition-colors">
+              ChronoTask
+            </span>
+            <span className="text-[9px] text-slate-500 uppercase font-bold tracking-widest mt-1">
+              COTRE/PE | DITRE/PE
+            </span>
           </div>
         </Link>
 
-        <nav className="hidden md:flex items-center gap-6 ml-8">
+        <nav className="hidden md:flex items-center gap-6 ml-6">
           <Link
             href="/dashboard"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/dashboard'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`${linkBaseStyle} ${pathname === '/dashboard' ? linkActiveStyle : linkInactiveStyle}`}
           >
             <LayoutDashboard className="w-4 h-4" /> Home
           </Link>
 
           <Link
             href="/minhas-atividades"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/minhas-atividades'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`${linkBaseStyle} ${pathname === '/minhas-atividades' ? linkActiveStyle : linkInactiveStyle}`}
           >
             <CheckCircle2 className="w-4 h-4" /> Minhas Atividades
           </Link>
 
           <Link
             href="/home"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/home'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`${linkBaseStyle} ${pathname === '/home' ? linkActiveStyle : linkInactiveStyle}`}
           >
             <Users className="w-4 h-4" /> Equipe
           </Link>
 
           <Link
             href="/calendario"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/calendario'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`${linkBaseStyle} ${pathname === '/calendario' ? linkActiveStyle : linkInactiveStyle}`}
           >
             <Calendar className="w-4 h-4" /> Calendário
           </Link>
@@ -81,10 +87,7 @@ export default function Header() {
           {isAdmin && (
             <Link
               href="/demandas-arquivadas"
-              className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/demandas-arquivadas'
-                ? 'text-primary font-bold'
-                : 'text-slate-400 hover:text-foreground'
-                }`}
+              className={`${linkBaseStyle} ${pathname === '/demandas-arquivadas' ? linkActiveStyle : linkInactiveStyle}`}
             >
               <Archive className="w-4 h-4" /> Arquivadas
             </Link>
@@ -92,37 +95,46 @@ export default function Header() {
 
           <Link
             href="/ajuda"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/ajuda' ? 'text-primary font-bold' : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`${linkBaseStyle} ${pathname === '/ajuda' ? linkActiveStyle : linkInactiveStyle}`}
           >
             <HelpCircle className="w-4 h-4" /> Ajuda
           </Link>
 
           <Link
             href="/relatorios"
-            className={`flex items-center gap-2 text-sm transition-colors ${pathname === '/relatorios'
-              ? 'text-primary font-bold'
-              : 'text-slate-400 hover:text-foreground'
-              }`}
+            className={`${linkBaseStyle} ${pathname === '/relatorios' ? linkActiveStyle : linkInactiveStyle}`}
           >
             <FileText className="w-4 h-4" /> Relatórios
           </Link>
         </nav>
       </div>
 
-      <div className="flex items-center gap-4">
-        <NotificationBell />
+      <div className="flex items-center gap-6">
+        
+        <div className="text-slate-500 hover:text-slate-800 transition-colors">
+          <NotificationBell />
+        </div>
 
-        <div className="flex items-center gap-3 pl-4 border-l border-white/10">
-          <Link href="/profile" className="flex items-center gap-2 hover:text-primary transition-colors">
-            <User className="w-4 h-4" />
-            <span className="text-sm font-medium">{user?.full_name?.split(" ")[0]}</span>
+        <div className="flex items-center gap-4">
+          <Link href="/profile" className="flex items-center gap-2 group cursor-pointer">
+            <div className="w-8 h-8 rounded-full bg-[#004785] text-white flex items-center justify-center transition-transform group-hover:scale-105">
+              <User className="w-4 h-4" />
+            </div>
+            <span className="text-sm font-semibold text-slate-700 group-hover:text-[#004785] transition-colors">
+              {user?.full_name?.split(" ")[0] || "Usuário"}
+            </span>
           </Link>
-          <Button variant="ghost" onClick={handleLogout} className="text-slate-400 hover:text-red-500 p-2 transition-colors">
+          
+          <button 
+            onClick={handleLogout} 
+            className="text-slate-400 hover:text-red-500 p-1.5 transition-colors rounded-md hover:bg-red-50"
+            title="Sair do sistema"
+          >
             <LogOut className="w-4 h-4" />
-          </Button>
+          </button>
         </div>
       </div>
+      
     </header>
   );
 }
