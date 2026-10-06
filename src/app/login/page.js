@@ -33,25 +33,12 @@ export default function LoginPage() {
     }
   }
 
-  async function signInWithMicrosoft() {
-    try {
-      await supabase.auth.signInWithOAuth({
-        provider: 'azure',
-        options: { 
-          redirectTo: window.location.origin + '/dashboard' 
-        }
-      });
-    } catch (error) {
-      alert("Erro ao conectar com Microsoft: " + error.message);
-    }
-  }
-
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4">
       <div className="w-full max-w-md bg-white dark:bg-slate-900 rounded-2xl shadow-xl border border-border/60 p-8">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-[#004785] rounded-2xl mx-auto mb-4 flex items-center justify-center text-white font-bold text-2xl">
-            CT
+            <img src="logo-chronotask.jpeg" alt="Logo-chronotask"></img>
           </div>
           <h1 className="text-2xl font-bold text-foreground">Bem-vindo ao ChronoTask</h1>
           <p className="text-muted-foreground text-sm mt-2">Entre com seu e-mail institucional</p>

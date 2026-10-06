@@ -9,5 +9,13 @@ export default function HeaderWrapper() {
     return null;
   }
 
+  if (pathname === "/login") {
+    return null;
+  }
+
+  if (pathname === "/register") {
+    return null;
+  }
+
   return <Header />;
 }

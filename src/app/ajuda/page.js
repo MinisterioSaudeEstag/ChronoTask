@@ -11,11 +11,6 @@ export default function AjudaPage() {
 
   const faqs = [
     {
-      pergunta: "Como eu atribuo uma nova demanda?",
-      resposta: "Apenas os Administradores (Eliane, Maria Juliana, Monalisa e Matheus) podem atribuir demandas. Clique no botão azul 'Atribuir Nova Demanda' no topo do Dashboard, preencha os campos do formulário e clique em salvar.",
-      icon: <FileText className="w-5 h-5 text-primary" />
-    },
-    {
       pergunta: "Como mudo o status de uma demanda?",
       resposta: "Na tabela de Demandas Recentes, clique no badge de status (ex: 'Pendente'). Um menu irá aparecer. Se o status for 'Concluída', será necessário escrever uma observação obrigatória.",
       icon: <CheckCircle className="w-5 h-5 text-emerald-500" />
@@ -34,6 +29,11 @@ export default function AjudaPage() {
       pergunta: "Como vejo as atividades dos outros colegas?",
       resposta: "No menu superior, clique em 'Equipe'. Você verá os cards de todos os funcionários. Clique em 'Ver Atividades' para abrir a lista detalhada de tarefas daquela pessoa.",
       icon: <Users className="w-5 h-5 text-blue-500" />
+    },
+    {
+      pergunta: "Como filtrar a tabela de demandas?",
+      resposta: "Abaixo dos status das demandas, possui-se um filtro por mês e um botão de filtros avançados, onde você pode filtrar mais detalhadamente.",
+      icon: <FileText className="w-5 h-5 text-purple-500" />
     }
   ];
 
@@ -110,7 +110,7 @@ export default function AjudaPage() {
           <CardContent className="p-8 text-center space-y-3">
             <h3 className="text-xl font-bold text-black">Ainda precisa de ajuda?</h3>
             <p className="text-sm text-black">
-              Entre em contato com a equipe de TI do DITRE/PE ou envie um e-mail para o administrador do sistema.
+              Entre em contato através do email arthur.moreira@saude.gov.br ou para assuntos relacionados ao sistema.
             </p>
             <div className="pt-2 text-xs uppercase tracking-widest text-black">
               COTRE/PE | DITRE/PE
