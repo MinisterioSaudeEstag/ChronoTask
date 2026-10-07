@@ -70,9 +70,6 @@ export default function LandingPage() {
                     Acessar o sistema <ArrowRight className="w-4 h-4" />
                   </Button>
                 </Link>
-                <Button size="lg" variant="outline" className="px-8 text-[#004785] border-[#004785] hover:bg-[#004785]/5 rounded-md">
-                  Conhecer recursos
-                </Button>
               </div>
             </div>
 
