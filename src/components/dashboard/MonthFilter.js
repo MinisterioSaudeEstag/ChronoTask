@@ -12,22 +12,20 @@ export default function MonthFilter({ selectedMonth, setSelectedMonth }) {
   ];
 
   return (
-    <div className="bg-white dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-white/10 shadow-sm">
-      <div className="flex items-center gap-2 overflow-x-auto pb-2">
-        <span className="text-[11px] font-bold uppercase tracking-wider mr-2 shrink-0 text-black">
+    <div className="bg-white px-4 py-2 rounded-xl border border-slate-200 shadow-sm w-full flex items-center">
+      <div className="flex items-center gap-2 overflow-x-auto w-full no-scrollbar">
+        <span className="text-[11px] font-bold text-slate-800 uppercase tracking-wider mr-2 shrink-0">
           📅 Mês de Atribuição:
         </span>
         <div className="flex items-center gap-1">
-          {/* text black */}
           {months.map((m) => (
             <button
               key={m.value}
               onClick={() => setSelectedMonth(m.value)}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${
-                selectedMonth === m.value
-                  ? 'bg-primary text-black shadow-md'
-                  : 'dark:bg-slate-800 text-black dark:text-slate-300'
-              }`}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all shrink-0 ${selectedMonth === m.value
+                  ? 'bg-white text-slate-900 shadow-[0_2px_8px_rgba(0,0,0,0.08)] border border-slate-100'
+                  : 'bg-transparent text-slate-500 hover:text-slate-800 hover:bg-slate-50 border border-transparent'
+                }`}
             >
               {m.label}
             </button>

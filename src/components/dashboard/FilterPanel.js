@@ -12,13 +12,13 @@ const STATUS_OPTIONS = [
 ];
 
 const PRODUCT_OPTIONS = [
-  'Planilha', 'Documento', 'Relatório', 'Parecer', 
+  'Planilha', 'Documento', 'Relatório', 'Parecer',
   'Nota Técnica', 'Ofício', 'Despacho', 'Outro'
 ];
 
-export default function FiltersPanel({ 
+export default function FiltersPanel({
   selectedStatuses, setSelectedStatuses,
-  selectedProducts, setSelectedProducts 
+  selectedProducts, setSelectedProducts
 }) {
   const [isOpen, setIsOpen] = useState(false);
 
@@ -49,52 +49,52 @@ export default function FiltersPanel({
     <>
       <button
         onClick={() => setIsOpen(true)}
-        className={`relative flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-bold transition-all ${
-          hasActiveFilters 
-            ? 'bg-primary text-black shadow-md' 
-            : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/10 text-black'
-        }`}
+        className={`relative flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold transition-all shadow-sm border ${hasActiveFilters
+            ? 'bg-blue-50 border-blue-200 text-[#004785]'
+            : 'bg-white border-slate-200 text-slate-800 hover:bg-slate-50'
+          }`}
       >
         <Filter className="w-4 h-4" />
         <span>Filtros</span>
         {hasActiveFilters && (
-          <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-black animate-pulse">
+          <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#004785] text-[10px] font-bold text-white shadow-sm">
             {selectedStatuses.length + selectedProducts.length}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex">
-          <div 
-            className="flex-1 bg-black/50 backdrop-blur-sm" 
+        <div className="fixed inset-0 z-50 flex justify-end">
+          <div
+            className="absolute inset-0 bg-slate-900/20 backdrop-blur-sm transition-opacity"
             onClick={() => setIsOpen(false)}
           />
-          
-          <div className="w-full max-w-md bg-white dark:bg-slate-900 shadow-2xl overflow-y-auto">
-            <div className="p-6 border-b border-slate-200 dark:border-white/10 flex justify-between items-center sticky top-0 bg-white dark:bg-slate-900 z-10">
+          <div className="relative w-full max-w-md bg-white h-full shadow-2xl flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="p-6 border-b border-slate-100 flex justify-between items-start bg-white">
               <div>
-                <h3 className="text-lg font-bold text-black dark:text-white">Filtros Avançados</h3>
-                <p className="text-xs text-slate-500">Refine a busca das demandas</p>
+                <h3 className="text-lg font-bold text-slate-900">Filtros Avançados</h3>
+                <p className="text-xs text-slate-500 mt-1">Refine a busca das demandas</p>
               </div>
-              <button onClick={() => setIsOpen(false)} className="text-black hover:text-slate-700">
-                <X className="w-5 h-5" />
+              <button
+                onClick={() => setIsOpen(false)}
+                className="text-slate-400 hover:text-slate-700 bg-slate-50 hover:bg-slate-100 p-2 rounded-full transition-colors"
+              >
+                <X className="w-4 h-4" />
               </button>
             </div>
 
-            <div className="p-6 space-y-6">
+            <div className="p-6 space-y-8 flex-1 overflow-y-auto">
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-slate-300 mb-3">Status</h4>
+                <h4 className="text-sm font-bold text-slate-800 mb-4">Status</h4>
                 <div className="flex flex-wrap gap-2">
                   {STATUS_OPTIONS.map(opt => (
                     <button
                       key={opt.value}
                       onClick={() => toggleStatus(opt.value)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                        selectedStatuses.includes(opt.value)
-                          ? 'bg-primary text-white border-primary'
-                          : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-primary'
-                      }`}
+                      className={`px-4 py-2 rounded-lg text-xs font-medium transition-all border ${selectedStatuses.includes(opt.value)
+                          ? 'bg-blue-50 text-[#004785] border-blue-200 font-bold'
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        }`}
                     >
                       {opt.label}
                     </button>
@@ -103,39 +103,38 @@ export default function FiltersPanel({
               </div>
 
               <div>
-                <h4 className="text-sm font-bold text-black dark:text-slate-300 mb-3">Tipo de Produto</h4>
+                <h4 className="text-sm font-bold text-slate-800 mb-4">Tipo de Produto</h4>
                 <div className="flex flex-wrap gap-2">
                   {PRODUCT_OPTIONS.map(prod => (
                     <button
                       key={prod}
                       onClick={() => toggleProduct(prod)}
-                      className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border ${
-                        selectedProducts.includes(prod)
-                          ? 'bg-primary text-white border-primary'
-                          : 'bg-slate-50 dark:bg-slate-800 text-black dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-primary'
-                      }`}
+                      className={`px-4 py-2 rounded-lg text-xs font-medium transition-all border ${selectedProducts.includes(prod)
+                          ? 'bg-blue-50 text-[#004785] border-blue-200 font-bold'
+                          : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300 hover:bg-slate-50'
+                        }`}
                     >
                       {prod}
                     </button>
                   ))}
                 </div>
               </div>
+            </div>
 
-              <div className="pt-4 border-t border-slate-200 dark:border-white/10 flex gap-2">
-                <button
-                  onClick={clearFilters}
-                  disabled={!hasActiveFilters}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 text-black dark:text-slate-300"
-                >
-                  Limpar
-                </button>
-                <button
-                  onClick={() => setIsOpen(false)}
-                  className="flex-1 px-4 py-2 rounded-lg text-sm font-bold bg-primary text-black"
-                >
-                  Aplicar Filtros
-                </button>
-              </div>
+            <div className="p-6 border-t border-slate-100 flex gap-3 bg-white">
+              <button
+                onClick={clearFilters}
+                disabled={!hasActiveFilters}
+                className="flex-1 px-4 py-3 rounded-xl text-sm font-semibold bg-slate-50 text-slate-600 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Limpar
+              </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="flex-[2] px-4 py-3 rounded-xl text-sm font-bold bg-[#004785] text-white hover:bg-[#003566] transition-colors shadow-sm"
+              >
+                Aplicar Filtros
+              </button>
             </div>
           </div>
         </div>
