@@ -136,20 +136,6 @@ export default function RelatoriosPage() {
               {!loading && <ArrowRight className="w-5 h-5 ml-2" />}
             </Button>
           </div>
-          <div className="bg-[#f4f8ff] border border-blue-100 rounded-2xl p-6 sm:p-8 flex items-start sm:items-center gap-5">
-            <div className="w-12 h-12 rounded-full bg-[#004785] flex items-center justify-center shrink-0 shadow-sm mt-1 sm:mt-0">
-              <Info className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h4 className="text-base font-bold text-[#004785] mb-1.5">
-                Dica para Power BI:
-              </h4>
-              <p className="text-sm text-[#004785]/80 leading-relaxed">
-                Esta planilha é gerada em formato de tabela plana. Ao importar no Power BI, utilize o <em>Power Query</em> para transformar a coluna "Data de Início" em tipo Data e a "Carga Horária" em Número Decimal para criar seus gráficos de produtividade.
-              </p>
-            </div>
-          </div>
-
         </div>
       </div>
     </div>
