@@ -152,33 +152,6 @@ export default function RelatoriosPage() {
 
         </div>
       </div>
-
-      <footer className="bg-white border-t border-slate-200 py-8 mt-auto relative z-10">
-        <div className="max-w-[1600px] mx-auto px-4 sm:px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-4">
-            <div className="text-xl font-black text-[#004785] tracking-tighter flex items-center gap-1">
-              <span>SUS</span>
-              <div className="w-4 h-4 bg-[#004785] rounded-sm flex items-center justify-center text-white">
-                <div className="w-2 h-0.5 bg-white rounded-full"></div>
-                <div className="h-2 w-0.5 bg-white absolute rounded-full"></div>
-              </div>
-            </div>
-            <div className="border-l border-slate-300 pl-4">
-              <p className="text-sm font-bold text-slate-700">MINISTÉRIO DA SAÚDE</p>
-              <p className="text-[10px] text-slate-500">Secretaria Executiva | COTRE/PE | DITRE/PE</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-xs font-semibold text-slate-400">
-            <Link href="#" className="hover:text-[#004785] transition-colors">Termos de Privacidade</Link>
-            <span>|</span>
-            <Link href="#" className="hover:text-[#004785] transition-colors">Suporte Técnico</Link>
-            <span>|</span>
-            <Link href="#" className="hover:text-[#004785] transition-colors flex items-center gap-1">
-              <Mail className="w-3 h-3" /> arthur.moreira@saude.gov.br
-            </Link>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
