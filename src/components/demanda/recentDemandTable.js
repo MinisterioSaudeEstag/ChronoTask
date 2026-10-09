@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from "react";
-import {
-  ExternalLink,
-  Clock,
-  Loader2,
-  MessageSquare,
-  Trash2,
-  MessageCircle,
+import { 
+  ExternalLink, 
+  Clock, 
+  Loader2, 
+  MessageSquare, 
+  Trash2, 
+  MessageCircle, 
   Archive,
   ClipboardList,
   ArrowRight,
@@ -30,7 +30,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-
+  
   const [simplifiedView, setSimplifiedView] = useState(false);
 
   const [obsModalOpen, setObsModalOpen] = useState(false);
@@ -90,13 +90,13 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     setUpdatingId(taskId);
     try {
       const novoEstado = !isFinalizado;
-
-      const { error } = await supabase.from("tasks").update({
-        is_finalizado: novoEstado
+      
+      const { error } = await supabase.from("tasks").update({ 
+        is_finalizado: novoEstado 
       }).eq("id", taskId);
-
+      
       if (error) throw error;
-
+      
       toast.success(novoEstado ? "Demanda finalizada!" : "Demanda reaberta!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
@@ -184,8 +184,8 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   }
 
   return (
-    <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-
+    <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden w-full col-span-full">
+    
       <div className="flex items-center justify-between p-5 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <ClipboardList className="w-5 h-5 text-[#004785]" />
@@ -196,7 +196,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
         </button>
       </div>
 
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto w-full">
         <table className="w-full text-sm text-left">
           <thead className="bg-white text-slate-500 uppercase text-[10px] font-bold tracking-wider">
             <tr className="border-b border-slate-100">
@@ -218,7 +218,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
             ) : (
               demandas.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-
+                  
                   <td className="px-3 py-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-[#004785] text-white flex items-center justify-center text-xs font-bold shrink-0">
@@ -227,7 +227,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       <span className="font-medium text-slate-700 text-xs">{item.funcionario_nome}</span>
                     </div>
                   </td>
-
+                  
                   <td className="px-3 py-3">
                     <div className="flex flex-col gap-0.5">
                       <p className="font-semibold text-xs text-[#004785] line-clamp-2" title={item.descricao}>
@@ -236,7 +236,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       <p className="text-[10px] text-slate-500">{item.produto}</p>
                     </div>
                   </td>
-
+                  
                   <td className="px-3 py-3 whitespace-nowrap">
                     {item.processo && item.processo.length >= 4 && item.processo !== "0000000" ? (
                       <button
@@ -252,18 +252,18 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       <span className="text-slate-400 text-xs">-</span>
                     )}
                   </td>
-
+                  
                   <td className="px-3 py-3 text-xs text-slate-600 whitespace-nowrap">
                     {item.convenio ? `${item.convenio} ${item.conv_year ? `| ${item.conv_year}` : ""}` : "-"}
                   </td>
-
+                  
                   <td className="px-3 py-3">
                     <div className="flex flex-col gap-1 text-[11px] text-slate-600">
                       <p><span className="font-bold text-[#004785]">Início:</span> {item.start_date || "-"}</p>
                       <p><span className="font-bold text-[#004785]">Término:</span> {item.expected_date || "-"}</p>
                     </div>
                   </td>
-
+                  
                   <td className="px-3 py-3 whitespace-nowrap">
                     <div className="flex items-center gap-1.5 text-slate-600">
                       <Clock className="w-3.5 h-3.5 text-slate-400" />
@@ -274,7 +274,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </span>
                     </div>
                   </td>
-
+                  
                   <td className="px-3 py-3 whitespace-nowrap">
                     <div className="relative">
                       {updatingId === item.id && (
@@ -296,10 +296,10 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </select>
                     </div>
                   </td>
-
+                  
                   <td className="px-3 py-3">
                     <div className="flex items-center justify-end gap-1">
-
+                      
                       <button
                         onClick={() => {
                           openChatModal(item);
@@ -335,15 +335,16 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           >
                             <Edit className="w-3.5 h-3.5" />
                           </button>
-
+                          
                           <button
                             onClick={() => handleQuickComplete(item.id, item.is_finalizado)}
                             disabled={updatingId === item.id}
                             title={item.is_finalizado ? "Reabrir demanda" : "Finalizar demanda"}
-                            className={`w-7 h-7 rounded flex items-center justify-center transition-colors ${item.is_finalizado
+                            className={`w-7 h-7 rounded flex items-center justify-center transition-colors ${
+                              item.is_finalizado
                                 ? 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-700'
                                 : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
-                              }`}
+                            }`}
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                           </button>

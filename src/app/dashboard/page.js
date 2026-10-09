@@ -6,12 +6,12 @@ import { useAuth } from "../../lib/authContext";
 import { supabase } from "../../lib/supabaseClient";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent } from "@/components/ui/card";
-import { 
-  ClipboardList, 
-  Clock, 
-  CheckCircle2, 
-  AlertTriangle, 
-  Users, 
+import {
+  ClipboardList,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  Users,
   Archive,
   ArrowRight,
   Calendar,
@@ -56,7 +56,7 @@ export default function Dashboard() {
         .select("*")
         .eq("archived", false)
         .order("created_at", { ascending: false });
-      
+
       if (error) {
         console.error("Erro ao buscar demandas:", error);
         return [];
@@ -93,8 +93,8 @@ export default function Dashboard() {
     return filtradas;
   }, [demandas, isAdmin, user, selectedMonth, selectedStatuses, selectedProducts]);
 
-  const myDemandas = !isAdmin 
-    ? demandasFiltradas.filter(d => d.funcionario_id === user?.id) 
+  const myDemandas = !isAdmin
+    ? demandasFiltradas.filter(d => d.funcionario_id === user?.id)
     : demandasFiltradas;
 
   const proximosVencimentos = useMemo(() => {
@@ -130,9 +130,9 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans px-4 sm:px-6 py-8 transition-colors duration-300">
       <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-8">
-        
+
         <div className="xl:col-span-8 2xl:col-span-9 space-y-8">
-          
+
           <div className="relative bg-gradient-to-r from-[#f0f5ff] to-[#e6f0ff] rounded-2xl p-8 lg:p-10 overflow-hidden border border-blue-100 shadow-sm">
             <div className="relative z-10 max-w-2xl">
               <div className="flex items-center justify-between mb-2">
@@ -150,7 +150,7 @@ export default function Dashboard() {
                 Aqui você acompanha suas demandas, prazos e o andamento das atividades da sua equipe, de forma simples e organizada.
               </p>
             </div>
-            
+
             <div className="absolute right-0 bottom-0 top-0 w-1/3 hidden lg:flex justify-end items-end p-8 opacity-10 pointer-events-none">
               <LayoutDashboard className="w-64 h-64 text-[#004785] translate-x-10 translate-y-10" />
             </div>
@@ -178,13 +178,13 @@ export default function Dashboard() {
 
           <div className="flex flex-col lg:flex-row items-center justify-between gap-4 bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
             <div className="flex-1 w-full lg:w-auto overflow-x-auto pb-2 lg:pb-0">
-              <MonthFilter 
-                selectedMonth={selectedMonth} 
-                setSelectedMonth={setSelectedMonth} 
+              <MonthFilter
+                selectedMonth={selectedMonth}
+                setSelectedMonth={setSelectedMonth}
               />
             </div>
             <div className="shrink-0">
-              <FiltersPanel 
+              <FiltersPanel
                 selectedStatuses={selectedStatuses}
                 setSelectedStatuses={setSelectedStatuses}
                 selectedProducts={selectedProducts}
@@ -220,7 +220,7 @@ export default function Dashboard() {
           <section>
             {isAdmin && (
               <div className="flex justify-end mb-4">
-                <Link 
+                <Link
                   href="/demandas-arquivadas"
                   className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-lg text-sm font-semibold hover:bg-slate-200 hover:text-slate-800 transition-colors"
                 >
@@ -229,18 +229,19 @@ export default function Dashboard() {
                 </Link>
               </div>
             )}
-
-            <DemandasRecentesTable 
-              demandas={myDemandas} 
-              isAdmin={isAdmin} 
-              onEdit={(task) => setTaskToEdit(task)} 
-            />
+            <div className="col-span-full w-full">
+              <DemandasRecentesTable
+                demandas={myDemandas}
+                isAdmin={isAdmin}
+                onEdit={(task) => setTaskToEdit(task)}
+              />
+            </div>
           </section>
 
         </div>
 
         <div className="xl:col-span-4 2xl:col-span-3 space-y-6">
-          
+
           <div className="bg-white rounded-xl border border-slate-200 p-5 flex items-center gap-4 shadow-sm">
             <div className="w-12 h-12 rounded-full bg-[#004785]/10 flex items-center justify-center text-[#004785] shrink-0">
               <Calendar className="w-6 h-6" />
@@ -257,7 +258,7 @@ export default function Dashboard() {
               <h3 className="font-bold text-[#004785]">Ações rápidas</h3>
             </div>
             <div className="p-2 flex flex-col gap-1">
-              
+
               <Link href="/minhas-atividades" className="flex items-center justify-between p-3 hover:bg-slate-50 rounded-lg group transition-colors">
                 <div className="flex items-center gap-3">
                   <div className="w-8 h-8 rounded-full bg-blue-50 text-blue-600 flex items-center justify-center group-hover:bg-blue-100"><CheckCircle2 className="w-4 h-4" /></div>
@@ -315,7 +316,7 @@ export default function Dashboard() {
                 Ver calendário →
               </Link>
             </div>
-            
+
             <div className="flex flex-col divide-y divide-slate-100 p-2">
               {proximosVencimentos.length > 0 ? proximosVencimentos.map(task => {
                 const dataSplit = task.expected_date ? task.expected_date.split('-') : null;
@@ -346,7 +347,7 @@ export default function Dashboard() {
 
             <div className="m-4 mt-2 bg-gradient-to-r from-blue-50 to-blue-100/50 rounded-lg p-4 flex items-start gap-3 border border-blue-100">
               <div className="bg-blue-500 p-1.5 rounded-full text-white mt-0.5 shrink-0 shadow-sm">
-                <CheckCircle2 className="w-4 h-4"/>
+                <CheckCircle2 className="w-4 h-4" />
               </div>
               <div>
                 <h4 className="text-sm font-bold text-[#004785] mb-1">Juntos por uma gestão mais eficiente</h4>
