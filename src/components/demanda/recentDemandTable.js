@@ -192,7 +192,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
           <h2 className="text-lg font-bold text-[#004785]">Demandas Recentes</h2>
         </div>
         <Link
-          href="/minhas-atividades"
+          href="/home"
           className="text-sm font-semibold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1 transition-colors"
         >
           Ver todas <ArrowRight className="w-4 h-4" />
