@@ -97,13 +97,6 @@ export default function Dashboard() {
     ? demandasFiltradas.filter(d => d.funcionario_id === user?.id)
     : demandasFiltradas;
 
-  const proximosVencimentos = useMemo(() => {
-    return [...myDemandas]
-      .filter(d => d.expected_date && d.status !== 'concluida')
-      .sort((a, b) => new Date(a.expected_date) - new Date(b.expected_date))
-      .slice(0, 3);
-  }, [myDemandas]);
-
   const stats = [
     { label: "Demandas", sub: "Total de demandas", value: myDemandas.length, icon: ClipboardList, color: "text-blue-600", bg: "bg-blue-100" },
     { label: "Em andamento", sub: "Em execução", value: myDemandas.filter(d => d.status === "em_andamento").length, icon: Clock, color: "text-emerald-600", bg: "bg-emerald-100" },
@@ -131,26 +124,41 @@ export default function Dashboard() {
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans px-4 sm:px-6 py-8 transition-colors duration-300">
       <div className="max-w-[1700px] mx-auto space-y-8 w-full">
 
-        <div className="relative bg-gradient-to-r from-[#f0f5ff] to-[#e6f0ff] rounded-2xl p-8 lg:p-10 overflow-hidden border border-blue-100 shadow-sm w-full">
-          <div className="relative z-10 max-w-3xl">
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-slate-800 text-lg font-bold">
-                Olá, {user?.full_name?.split(" ")[0] || "Usuário"}! 👋
-              </h2>
-              {isAdmin && (
-                <NovaDemandaDialog taskToEdit={taskToEdit} setTaskToEdit={setTaskToEdit} />
-              )}
+        <div className="flex flex-col lg:flex-row gap-6 items-stretch w-full">
+          <div className="relative bg-gradient-to-r from-[#f0f5ff] to-[#e6f0ff] rounded-2xl p-8 lg:p-10 overflow-hidden border border-blue-100 shadow-sm flex-1">
+            <div className="relative z-10 max-w-3xl">
+              <div className="flex items-center justify-between mb-2">
+                <h2 className="text-slate-800 text-lg font-bold">
+                  Olá, {user?.full_name?.split(" ")[0] || "Usuário"}! 👋
+                </h2>
+                {isAdmin && (
+                  <NovaDemandaDialog taskToEdit={taskToEdit} setTaskToEdit={setTaskToEdit} />
+                )}
+              </div>
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#004785] mb-4 tracking-tight">
+                Bem-vindo ao ChronoTask
+              </h1>
+              <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-2xl">
+                Aqui você acompanha suas demandas, prazos e o andamento das atividades da sua equipe, de forma simples e organizada.
+              </p>
             </div>
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-[#004785] mb-4 tracking-tight">
-              Bem-vindo ao ChronoTask
-            </h1>
-            <p className="text-slate-600 text-base sm:text-lg leading-relaxed max-w-2xl">
-              Aqui você acompanha suas demandas, prazos e o andamento das atividades da sua equipe, de forma simples e organizada.
-            </p>
+
+            <div className="absolute right-0 bottom-0 top-0 w-1/3 hidden lg:flex justify-end items-end p-8 opacity-10 pointer-events-none">
+              <LayoutDashboard className="w-64 h-64 text-[#004785] translate-x-10 translate-y-10" />
+            </div>
           </div>
 
-          <div className="absolute right-0 bottom-0 top-0 w-1/3 hidden lg:flex justify-end items-end p-8 opacity-10 pointer-events-none">
-            <LayoutDashboard className="w-64 h-64 text-[#004785] translate-x-10 translate-y-10" />
+          <div className="bg-white rounded-2xl border border-slate-200 p-6 flex flex-col justify-center gap-3 shadow-sm shrink-0 lg:w-80">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-full bg-[#004785]/10 flex items-center justify-center text-[#004785] shrink-0">
+                <Calendar className="w-6 h-6" />
+              </div>
+              <div>
+                <p className="text-xs text-slate-500 uppercase font-bold tracking-wider">Data atual</p>
+                <h3 className="font-bold text-slate-800 text-sm capitalize">{diaSemana}</h3>
+              </div>
+            </div>
+            <p className="text-base font-extrabold text-[#004785] pl-1">{dataFormatada}</p>
           </div>
         </div>
 
@@ -197,6 +205,24 @@ export default function Dashboard() {
           </div>
         )}
 
+        {isAdmin && (
+          <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full">
+            <div className="flex items-center gap-2 mb-6">
+              <Users className="w-5 h-5 text-[#004785]" />
+              <h2 className="text-lg font-bold text-slate-800">Equipe</h2>
+            </div>
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+              {equipe.map(func => (
+                <FuncionarioCard
+                  key={func.id}
+                  nome={func.full_name}
+                  demandas={demandas.filter(d => d.funcionario_id === func.id)}
+                />
+              ))}
+            </div>
+          </section>
+        )}
+
         <section className="w-full">
           {isAdmin && (
             <div className="flex justify-end mb-4">
@@ -218,24 +244,6 @@ export default function Dashboard() {
             />
           </div>
         </section>
-
-        {isAdmin && (
-          <section className="bg-white p-6 rounded-xl border border-slate-200 shadow-sm w-full">
-            <div className="flex items-center gap-2 mb-6">
-              <Users className="w-5 h-5 text-[#004785]" />
-              <h2 className="text-lg font-bold text-slate-800">Equipe</h2>
-            </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {equipe.map(func => (
-                <FuncionarioCard
-                  key={func.id}
-                  nome={func.full_name}
-                  demandas={demandas.filter(d => d.funcionario_id === func.id)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
 
       </div>
     </div>
