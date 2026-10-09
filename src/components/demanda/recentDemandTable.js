@@ -1,13 +1,13 @@
 'use client';
 
 import React, { useState } from "react";
-import { 
-  ExternalLink, 
-  Clock, 
-  Loader2, 
-  MessageSquare, 
-  Trash2, 
-  MessageCircle, 
+import {
+  ExternalLink,
+  Clock,
+  Loader2,
+  MessageSquare,
+  Trash2,
+  MessageCircle,
   Archive,
   ClipboardList,
   ArrowRight,
@@ -30,7 +30,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
   const { user } = useAuth();
   const [updatingId, setUpdatingId] = useState(null);
   const [deletingId, setDeletingId] = useState(null);
-  
+
   const [simplifiedView, setSimplifiedView] = useState(false);
 
   const [obsModalOpen, setObsModalOpen] = useState(false);
@@ -90,13 +90,13 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
     setUpdatingId(taskId);
     try {
       const novoEstado = !isFinalizado;
-      
-      const { error } = await supabase.from("tasks").update({ 
-        is_finalizado: novoEstado 
+
+      const { error } = await supabase.from("tasks").update({
+        is_finalizado: novoEstado
       }).eq("id", taskId);
-      
+
       if (error) throw error;
-      
+
       toast.success(novoEstado ? "Demanda finalizada!" : "Demanda reaberta!");
       queryClient.invalidateQueries(["demandas"]);
     } catch (error) {
@@ -185,7 +185,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
 
   return (
     <section className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-    
+
       <div className="flex items-center justify-between p-5 border-b border-slate-100">
         <div className="flex items-center gap-2">
           <ClipboardList className="w-5 h-5 text-[#004785]" />
@@ -200,44 +200,44 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
         <table className="w-full text-sm text-left">
           <thead className="bg-white text-slate-500 uppercase text-[10px] font-bold tracking-wider">
             <tr className="border-b border-slate-100">
-              <th className="px-5 py-4">Funcionário</th>
-              <th className="px-5 py-4">Demanda / Produto</th>
-              <th className="px-5 py-4">Processo</th>
-              <th className="px-5 py-4">Convênio</th>
-              <th className="px-5 py-4">Início / Término</th>
-              <th className="px-5 py-4">Carga Horária</th>
-              <th className="px-5 py-4">Status</th>
-              <th className="px-5 py-4 text-right">Ações</th>
+              <th className="px-3 py-3">Funcionário</th>
+              <th className="px-3 py-3">Demanda / Produto</th>
+              <th className="px-3 py-3">Processo</th>
+              <th className="px-3 py-3">Convênio</th>
+              <th className="px-3 py-3">Início / Término</th>
+              <th className="px-3 py-3">Carga Horária</th>
+              <th className="px-3 py-3">Status</th>
+              <th className="px-3 py-3 text-right">Ações</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100">
             {demandas.length === 0 ? (
               <tr>
-                <td colSpan="8" className="px-5 py-20 text-center text-slate-500">Nenhuma demanda encontrada.</td>
+                <td colSpan="8" className="px-3 py-20 text-center text-slate-500">Nenhuma demanda encontrada.</td>
               </tr>
             ) : (
               demandas.map((item) => (
                 <tr key={item.id} className="hover:bg-slate-50/50 transition-colors group">
-                  
-                  <td className="px-5 py-4 whitespace-nowrap">
-                    <div className="flex items-center gap-3">
+
+                  <td className="px-3 py-3">
+                    <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-full bg-[#004785] text-white flex items-center justify-center text-xs font-bold shrink-0">
                         {getInitials(item.funcionario_nome)}
                       </div>
-                      <span className="font-medium text-slate-700">{item.funcionario_nome}</span>
+                      <span className="font-medium text-slate-700 text-xs">{item.funcionario_nome}</span>
                     </div>
                   </td>
-                  
-                  <td className="px-5 py-4">
+
+                  <td className="px-3 py-3">
                     <div className="flex flex-col gap-0.5">
-                      <p className="font-semibold text-sm text-[#004785] truncate max-w-[220px]" title={item.descricao}>
+                      <p className="font-semibold text-xs text-[#004785] line-clamp-2" title={item.descricao}>
                         {item.descricao}
                       </p>
-                      <p className="text-[11px] text-slate-500">{item.produto}</p>
+                      <p className="text-[10px] text-slate-500">{item.produto}</p>
                     </div>
                   </td>
-                  
-                  <td className="px-5 py-4 whitespace-nowrap">
+
+                  <td className="px-3 py-3 whitespace-nowrap">
                     {item.processo && item.processo.length >= 4 && item.processo !== "0000000" ? (
                       <button
                         onClick={() => {
@@ -252,21 +252,21 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       <span className="text-slate-400 text-xs">-</span>
                     )}
                   </td>
-                  
-                  <td className="px-5 py-4 text-xs text-slate-600 whitespace-nowrap">
+
+                  <td className="px-3 py-3 text-xs text-slate-600 whitespace-nowrap">
                     {item.convenio ? `${item.convenio} ${item.conv_year ? `| ${item.conv_year}` : ""}` : "-"}
                   </td>
-                  
-                  <td className="px-5 py-4 whitespace-nowrap">
-                    <div className="flex flex-col gap-1 text-xs text-slate-600">
+
+                  <td className="px-3 py-3">
+                    <div className="flex flex-col gap-1 text-[11px] text-slate-600">
                       <p><span className="font-bold text-[#004785]">Início:</span> {item.start_date || "-"}</p>
                       <p><span className="font-bold text-[#004785]">Término:</span> {item.expected_date || "-"}</p>
                     </div>
                   </td>
-                  
-                  <td className="px-5 py-4 whitespace-nowrap">
+
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="flex items-center gap-1.5 text-slate-600">
-                      <Clock className="w-4 h-4 text-slate-400" />
+                      <Clock className="w-3.5 h-3.5 text-slate-400" />
                       <span className="text-xs font-medium">
                         {(item.expected_time !== null && item.expected_time !== undefined && item.expected_time !== "")
                           ? `${item.expected_time}h`
@@ -274,8 +274,8 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </span>
                     </div>
                   </td>
-                  
-                  <td className="px-5 py-4 whitespace-nowrap">
+
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="relative">
                       {updatingId === item.id && (
                         <div className="absolute inset-0 bg-white/50 flex items-center justify-center z-10">
@@ -286,7 +286,7 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                         value={item.status}
                         onChange={(e) => handleStatusChange(item.id, e.target.value)}
                         disabled={updatingId === item.id || (!isAdmin && item.funcionario_id !== user?.id)}
-                        className={`px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wide outline-none cursor-pointer appearance-none border-none text-center
+                        className={`px-2 py-1 rounded-full text-[9px] font-bold uppercase tracking-wide outline-none cursor-pointer appearance-none border-none text-center
                           ${STATUS_OPTIONS.find(opt => opt.value === item.status)?.color || "bg-slate-100"}
                         `}
                       >
@@ -296,21 +296,21 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                       </select>
                     </div>
                   </td>
-                  
-                  <td className="px-5 py-4">
-                    <div className="flex items-center justify-end gap-2">
-                      
+
+                  <td className="px-3 py-3">
+                    <div className="flex items-center justify-end gap-1">
+
                       <button
                         onClick={() => {
                           openChatModal(item);
                           markAsRead(item.id);
                         }}
                         title="Chat da demanda"
-                        className="relative w-8 h-8 rounded bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 flex items-center justify-center transition-colors"
+                        className="relative w-7 h-7 rounded bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 flex items-center justify-center transition-colors"
                       >
-                        <MessageCircle className="w-4 h-4" />
+                        <MessageCircle className="w-3.5 h-3.5" />
                         {unreadMap[item.id] > 0 && (
-                          <span className="absolute -top-1.5 -right-1.5 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white shadow-sm animate-pulse">
+                          <span className="absolute -top-1.5 -right-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold text-white shadow-sm animate-pulse">
                             {unreadMap[item.id]}
                           </span>
                         )}
@@ -320,9 +320,9 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                         <button
                           onClick={() => openObservationModal(item)}
                           title="Observações"
-                          className="w-8 h-8 rounded bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 flex items-center justify-center transition-colors"
+                          className="w-7 h-7 rounded bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 flex items-center justify-center transition-colors"
                         >
-                          <FileText className="w-4 h-4" />
+                          <FileText className="w-3.5 h-3.5" />
                         </button>
                       )}
 
@@ -331,22 +331,21 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                           <button
                             onClick={() => onEdit(item)}
                             title="Editar demanda"
-                            className="w-8 h-8 rounded bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded bg-blue-50 text-blue-500 hover:bg-blue-100 hover:text-blue-700 flex items-center justify-center transition-colors"
                           >
-                            <Edit className="w-4 h-4" />
+                            <Edit className="w-3.5 h-3.5" />
                           </button>
-                          
+
                           <button
                             onClick={() => handleQuickComplete(item.id, item.is_finalizado)}
                             disabled={updatingId === item.id}
                             title={item.is_finalizado ? "Reabrir demanda" : "Finalizar demanda"}
-                            className={`w-8 h-8 rounded flex items-center justify-center transition-colors ${
-                              item.is_finalizado
+                            className={`w-7 h-7 rounded flex items-center justify-center transition-colors ${item.is_finalizado
                                 ? 'bg-emerald-50 text-emerald-500 hover:bg-emerald-100 hover:text-emerald-700'
                                 : 'bg-slate-50 text-slate-400 hover:bg-slate-100 hover:text-slate-600'
-                            }`}
+                              }`}
                           >
-                            <CheckCircle2 className="w-4 h-4" />
+                            <CheckCircle2 className="w-3.5 h-3.5" />
                           </button>
 
                           <button
@@ -356,21 +355,21 @@ export default function DemandasRecentesTable({ demandas, isAdmin, onEdit }) {
                               }
                             }}
                             title="Arquivar demanda"
-                            className="w-8 h-8 rounded bg-amber-50 text-amber-500 hover:bg-amber-100 hover:text-amber-700 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded bg-amber-50 text-amber-500 hover:bg-amber-100 hover:text-amber-700 flex items-center justify-center transition-colors"
                           >
-                            <Archive className="w-4 h-4" />
+                            <Archive className="w-3.5 h-3.5" />
                           </button>
 
                           <button
                             disabled={deletingId === item.id}
                             onClick={() => handleDelete(item.id, item.descricao)}
                             title="Excluir demanda"
-                            className="w-8 h-8 rounded bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 flex items-center justify-center transition-colors"
+                            className="w-7 h-7 rounded bg-red-50 text-red-500 hover:bg-red-100 hover:text-red-700 flex items-center justify-center transition-colors"
                           >
                             {deletingId === item.id ? (
-                              <Loader2 className="w-4 h-4 animate-spin" />
+                              <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             ) : (
-                              <Trash2 className="w-4 h-4" />
+                              <Trash2 className="w-3.5 h-3.5" />
                             )}
                           </button>
                         </>
