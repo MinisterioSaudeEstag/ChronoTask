@@ -328,59 +328,63 @@ export default function HomeEquipe() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filteredEquipe.map(emp => {
               const stats = getStats(emp.id);
               return (
                 <Card
                   key={emp.id}
-                  className="bg-white rounded-xl border border-slate-200 shadow-sm hover:shadow-md hover:border-[#004785]/30 transition-all group overflow-hidden flex flex-col"
+                  className="bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-[#004785]/30 transition-all group overflow-hidden flex flex-col"
                 >
-                  <CardContent className="p-5 flex-1 flex flex-col">
-                    <div className="flex items-start justify-between mb-5">
-                      <div className="flex items-center gap-3 overflow-hidden">
-                        <div className="w-12 h-12 rounded-full bg-blue-50 text-[#004785] flex items-center justify-center text-lg font-black shrink-0 shadow-inner">
-                          {emp.avatar_url ? (
-                            <img src={emp.avatar_url} className="w-full h-full rounded-full object-cover" alt={emp.full_name} />
-                          ) : getInitials(emp.full_name)}
+                  <CardContent className="p-5 flex-1 flex flex-col justify-between">
+                    <div>
+                      <div className="flex items-start justify-between mb-5">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          <div className="w-12 h-12 rounded-full bg-blue-50 text-[#004785] flex items-center justify-center text-lg font-black shrink-0 shadow-inner">
+                            {emp.avatar_url ? (
+                              <img src={emp.avatar_url} className="w-full h-full rounded-full object-cover" alt={emp.full_name} />
+                            ) : getInitials(emp.full_name)}
+                          </div>
+                          <p className="font-bold text-[#004785] text-sm leading-tight truncate group-hover:text-blue-700 transition-colors">
+                            {emp.full_name}
+                          </p>
                         </div>
-                        <p className="font-bold text-[#004785] text-sm leading-tight truncate group-hover:text-blue-700 transition-colors">
-                          {emp.full_name}
-                        </p>
+                        <button className="text-slate-400 hover:text-[#004785] shrink-0 transition-colors">
+                          <MoreVertical className="w-4 h-4" />
+                        </button>
                       </div>
-                      <button className="text-slate-400 hover:text-[#004785] shrink-0 transition-colors">
-                        <MoreVertical className="w-4 h-4" />
-                      </button>
+
+                      <div className="grid grid-cols-3 gap-2.5 mb-6">
+                        <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <span className="w-2 h-2 rounded-full bg-blue-500"></span>
+                            <span className="text-base font-black text-slate-800 leading-none">{stats.em_andamento}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider text-center leading-tight">Em andamento</span>
+                        </div>
+                        
+                        <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <AlertTriangle className="w-3.5 h-3.5 text-red-500" />
+                            <span className="text-base font-black text-slate-800 leading-none">{stats.atrasadas}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider text-center leading-tight">Atrasadas</span>
+                        </div>
+
+                        <div className="flex flex-col items-center justify-center p-2.5 rounded-xl bg-slate-50/80 border border-slate-100">
+                          <div className="flex items-center gap-1.5 mb-1.5">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                            <span className="text-base font-black text-slate-800 leading-none">{stats.concluidas}</span>
+                          </div>
+                          <span className="text-[10px] text-slate-500 font-bold uppercase tracking-wider text-center leading-tight">Concluídas</span>
+                        </div>
+                      </div>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2 mb-6">
-                      <div className="flex flex-col items-center p-2 rounded-lg bg-slate-50 border border-slate-100">
-                        <div className="flex items-center gap-1 mb-1">
-                          <span className="w-2 h-2 rounded-full bg-blue-500"></span>
-                          <span className="text-base font-black text-slate-800 leading-none">{stats.em_andamento}</span>
-                        </div>
-                        <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wider text-center">Em andamento</span>
-                      </div>
-                      <div className="flex flex-col items-center p-2 rounded-lg bg-slate-50 border border-slate-100">
-                        <div className="flex items-center gap-1 mb-1">
-                          <AlertTriangle className="w-3 h-3 text-red-500" />
-                          <span className="text-base font-black text-slate-800 leading-none">{stats.atrasadas}</span>
-                        </div>
-                        <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wider text-center">Atrasadas</span>
-                      </div>
-                      <div className="flex flex-col items-center p-2 rounded-lg bg-slate-50 border border-slate-100">
-                        <div className="flex items-center gap-1 mb-1">
-                          <CheckCircle2 className="w-3 h-3 text-emerald-500" />
-                          <span className="text-base font-black text-slate-800 leading-none">{stats.concluidas}</span>
-                        </div>
-                        <span className="text-[9px] text-slate-500 font-semibold uppercase tracking-wider text-center">Concluídas</span>
-                      </div>
-                    </div>
-
-                    <div className="mt-auto">
+                    <div>
                       <Button
                         variant="outline"
-                        className="w-full border-blue-100 text-[#004785] hover:bg-blue-50 hover:border-blue-200 font-bold transition-all rounded-lg text-xs"
+                        className="w-full border-blue-100 text-[#004785] hover:bg-blue-50 hover:border-blue-200 font-bold transition-all rounded-xl text-xs py-2"
                         onClick={() => setSelectedEmployee(emp)}
                       >
                         Ver atividades →
