@@ -20,6 +20,11 @@ export default function MinhasAtividades() {
   const [observation, setObservation] = useState("");
   const [activeTab, setActiveTab] = useState("todas"); 
 
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filtroProduto, setFiltroProduto] = useState("todos");
+  const [filtroStatus, setFiltroStatus] = useState("todos");
+  const [filtroConvenio, setFiltroConvenio] = useState("todos");
+
   const { data: tasks = [], isLoading } = useQuery({
     queryKey: ["my_tasks", user?.id],
     queryFn: async () => {
@@ -33,6 +38,16 @@ export default function MinhasAtividades() {
     },
     enabled: !!user,
   });
+
+  const productOptions = useMemo(() => {
+    const products = tasks.map(t => t.produto).filter(Boolean);
+    return [...new Set(products)];
+  }, [tasks]);
+
+  const convenioOptions = useMemo(() => {
+    const convenios = tasks.map(t => t.convenio).filter(Boolean);
+    return [...new Set(convenios)];
+  }, [tasks]);
 
   async function handleAddObservation(taskId) {
     const obs = window.prompt("Escreva sua observação ou devolutiva:");
@@ -75,11 +90,47 @@ export default function MinhasAtividades() {
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {
-    if (activeTab === "em_andamento") return tasks.filter(t => t.status === 'em_andamento');
-    if (activeTab === "atrasadas") return tasks.filter(t => t.status === 'atrasada');
-    if (activeTab === "concluidas") return tasks.filter(t => t.status === 'concluida');
-    return tasks;
-  }, [tasks, activeTab]);
+    let resultado = [...tasks];
+
+    if (activeTab === "em_andamento") {
+      resultado = resultado.filter(t => t.status === 'em_andamento');
+    } else if (activeTab === "atrasadas") {
+      resultado = resultado.filter(t => t.status === 'atrasada');
+    } else if (activeTab === "concluidas") {
+      resultado = resultado.filter(t => t.status === 'concluida');
+    }
+
+    if (searchQuery.trim() !== "") {
+      const q = searchQuery.toLowerCase();
+      resultado = resultado.filter(t => 
+        (t.descricao && t.descricao.toLowerCase().includes(q)) ||
+        (t.convenio && t.convenio.toLowerCase().includes(q)) ||
+        (t.processo && t.processo.toLowerCase().includes(q))
+      );
+    }
+
+    if (filtroProduto !== "todos") {
+      resultado = resultado.filter(t => t.produto === filtroProduto);
+    }
+
+    if (filtroStatus !== "todos") {
+      resultado = resultado.filter(t => t.status === filtroStatus);
+    }
+
+    if (filtroConvenio !== "todos") {
+      resultado = resultado.filter(t => t.convenio === filtroConvenio || t.processo === filtroConvenio);
+    }
+
+    return resultado;
+  }, [tasks, activeTab, searchQuery, filtroProduto, filtroStatus, filtroConvenio]);
+
+  function limparFiltros() {
+    setFiltroProduto("todos");
+    setFiltroStatus("todos");
+    setFiltroConvenio("todos");
+    setSearchQuery("");
+    toast.info("Filtros limpos!");
+  }
 
   const getInitials = (name) => {
     if (!name) return "AV";
@@ -109,6 +160,7 @@ export default function MinhasAtividades() {
   return (
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans p-4 lg:p-6 transition-colors duration-300">
       <div className="max-w-[1600px] mx-auto grid grid-cols-1 xl:grid-cols-12 gap-6 xl:gap-8">
+        
         <div className="hidden xl:block xl:col-span-3 space-y-6">
           <div className="bg-white rounded-xl border border-slate-200 shadow-sm p-5 h-full">
             <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-5">
@@ -116,19 +168,71 @@ export default function MinhasAtividades() {
                 <Filter className="w-5 h-5" />
                 <h3 className="font-bold text-lg">Filtros</h3>
               </div>
-              <button className="text-xs text-blue-600 font-medium hover:underline">Limpar filtros</button>
+              <button onClick={limparFiltros} className="text-xs text-blue-600 font-medium hover:underline">Limpar filtros</button>
             </div>
 
             <div className="space-y-5">
-              <FilterSelect label="Tipo de produto" icon={<ClipboardList className="w-4 h-4" />} placeholder="Todos os tipos" />
-              <FilterSelect label="Status" icon={<Clock className="w-4 h-4" />} placeholder="Todos os status" />
-              <FilterSelect label="Prazo de finalização" icon={<Calendar className="w-4 h-4" />} placeholder="Selecione o período" />
-              <FilterSelect label="Data de atribuição" icon={<Calendar className="w-4 h-4" />} placeholder="Selecione o período" />
-              <FilterSelect label="Convênio / Processo" icon={<FileText className="w-4 h-4" />} placeholder="Todos os convênios" />
-              <FilterSelect label="Responsável" icon={<CheckCircle2 className="w-4 h-4" />} placeholder="Todos os responsáveis" />
+              <div>
+                <label className="flex items-center gap-2 text-xs font-bold text-[#004785] mb-2">
+                  <ClipboardList className="w-4 h-4" /> Tipo de produto
+                </label>
+                <div className="relative">
+                  <select 
+                    value={filtroProduto} 
+                    onChange={(e) => setFiltroProduto(e.target.value)}
+                    className="w-full appearance-none bg-white border border-slate-200 text-slate-600 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-[#004785] cursor-pointer"
+                  >
+                    <option value="todos">Todos os tipos</option>
+                    {productOptions.map(prod => (
+                      <option key={prod} value={prod}>{prod}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-3 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-xs font-bold text-[#004785] mb-2">
+                  <Clock className="w-4 h-4" /> Status
+                </label>
+                <div className="relative">
+                  <select 
+                    value={filtroStatus} 
+                    onChange={(e) => setFiltroStatus(e.target.value)}
+                    className="w-full appearance-none bg-white border border-slate-200 text-slate-600 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-[#004785] cursor-pointer"
+                  >
+                    <option value="todos">Todos os status</option>
+                    <option value="nao_iniciado">Não Iniciada</option>
+                    <option value="pendente">Pendente</option>
+                    <option value="em_andamento">Em Andamento</option>
+                    <option value="concluida">Concluída</option>
+                    <option value="atrasada">Atrasada</option>
+                  </select>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-3 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
+
+              <div>
+                <label className="flex items-center gap-2 text-xs font-bold text-[#004785] mb-2">
+                  <FileText className="w-4 h-4" /> Convênio / Processo
+                </label>
+                <div className="relative">
+                  <select 
+                    value={filtroConvenio} 
+                    onChange={(e) => setFiltroConvenio(e.target.value)}
+                    className="w-full appearance-none bg-white border border-slate-200 text-slate-600 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-[#004785] cursor-pointer"
+                  >
+                    <option value="todos">Todos os convênios</option>
+                    {convenioOptions.map(conv => (
+                      <option key={conv} value={conv}>Convênio {conv}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="w-4 h-4 absolute right-3 top-3 text-slate-400 pointer-events-none" />
+                </div>
+              </div>
             </div>
 
-            <button className="w-full mt-8 bg-[#004785] hover:bg-[#003566] text-white py-3 rounded-lg flex items-center justify-center gap-2 font-bold transition-colors">
+            <button onClick={() => toast.success("Filtros aplicados com sucesso!")} className="w-full mt-8 bg-[#004785] hover:bg-[#003566] text-white py-3 rounded-lg flex items-center justify-center gap-2 font-bold transition-colors">
               <Filter className="w-4 h-4" /> Aplicar filtros
             </button>
           </div>
@@ -147,7 +251,13 @@ export default function MinhasAtividades() {
             </div>
             <div className="hidden md:flex relative w-64">
               <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-400" />
-              <input type="text" placeholder="Buscar por demanda, convênio..." className="w-full bg-white border border-slate-200 rounded-lg py-2 pl-9 pr-4 text-sm outline-none focus:border-[#004785]" />
+              <input 
+                type="text" 
+                placeholder="Buscar por demanda, convênio..." 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-lg py-2 pl-9 pr-4 text-sm outline-none focus:border-[#004785]" 
+              />
             </div>
           </div>
 
@@ -164,12 +274,6 @@ export default function MinhasAtividades() {
               <TabButton active={activeTab === 'em_andamento'} onClick={() => setActiveTab('em_andamento')} color="blue" dot label="Em andamento" />
               <TabButton active={activeTab === 'atrasadas'} onClick={() => setActiveTab('atrasadas')} color="red" dot label="Atrasadas" />
               <TabButton active={activeTab === 'concluidas'} onClick={() => setActiveTab('concluidas')} color="green" dot label="Concluídas" />
-            </div>
-            <div className="flex items-center gap-2 shrink-0 border-l border-slate-100 pl-4">
-              <span className="text-xs text-slate-500">Ordenar por</span>
-              <button className="flex items-center gap-2 text-sm font-semibold text-slate-700 bg-slate-50 px-3 py-1.5 rounded-lg border border-slate-200">
-                Prazo mais próximo <ChevronDown className="w-4 h-4" />
-              </button>
             </div>
           </div>
 
@@ -268,7 +372,6 @@ export default function MinhasAtividades() {
               })
             )}
           </div>
-
         </div>
 
         <div className="hidden xl:block xl:col-span-3 space-y-6">
@@ -333,24 +436,8 @@ export default function MinhasAtividades() {
             </p>
             <div className="w-8 h-1 bg-[#004785] mt-4 rounded-full opacity-20"></div>
           </div>
-
         </div>
-      </div>
-    </div>
-  );
-}
 
-function FilterSelect({ label, icon, placeholder }) {
-  return (
-    <div>
-      <label className="flex items-center gap-2 text-xs font-bold text-[#004785] mb-2">
-        {icon} {label}
-      </label>
-      <div className="relative">
-        <select className="w-full appearance-none bg-white border border-slate-200 text-slate-600 text-sm rounded-lg px-3 py-2.5 outline-none focus:border-[#004785] cursor-pointer">
-          <option>{placeholder}</option>
-        </select>
-        <ChevronDown className="w-4 h-4 absolute right-3 top-3 text-slate-400 pointer-events-none" />
       </div>
     </div>
   );
@@ -364,7 +451,7 @@ function StatCard({ icon, value, label, color, bg }) {
           {icon}
         </div>
         <div>
-          <p className={`text-xl font-black leading-none mb-1 ${color === 'text-blue-600' ? 'text-slate-800' : 'text-slate-800'}`}>{value}</p>
+          <p className="text-xl font-black leading-none mb-1 text-slate-800">{value}</p>
           <p className="text-[10px] sm:text-xs text-slate-500 font-medium">{label}</p>
         </div>
       </div>
